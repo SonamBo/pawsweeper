@@ -7,8 +7,8 @@ export default {
   "applicationId": "com.pixelartgames.meowsweeper",
   "versionCode": 1,
   "versionName": "1.0.0",
-  "privacyUrl": "https://example.com/privacy-policy/",
-  "contactEmail": "you@example.com",
+  "privacyUrl": "https://pixelartgames000.github.io/privacy-policy/",
+  "contactEmail": "pixelartgames000@gmail.com",
   "coinPacks": [
     { "id": "coins_500", "coins": 500, "name": "Pocket change" },
     { "id": "coins_1200", "coins": 1200, "name": "Coin purse" },
