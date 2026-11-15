@@ -2,16 +2,24 @@
 
 .ms-root {
   --cu1: #fbd9a8; --cu2: #f3bd7c; --cu-edge: #d89a55; --cu-ink: #8a5a2b;
+  /* A fabric with artwork paints the cushion from its image; one without (Knit, until its art arrives) is drawn here. */
+  --cu-bg: url("img/cushion-gingham.png") center / 100% 100% no-repeat;
+  --cu-shadow: none; --cu-dot: 0;
   --floor: #fffaf0; --floor-edge: #eadfc9;
   padding: var(--s2) var(--s3) var(--s3);
   gap: var(--s2);
   user-select: none; -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
-.ms-root[data-fabric="knit"]      { --cu1: #c9dcb4; --cu2: #a9c48d; --cu-edge: #86a56a; --cu-ink: #4d6a35; }
-.ms-root[data-fabric="velvet"]    { --cu1: #cdb8ec; --cu2: #ab90d8; --cu-edge: #8a6fc0; --cu-ink: #513a86; }
-.ms-root[data-fabric="patchwork"] { --cu1: #f6c1c0; --cu2: #f0a59a; --cu-edge: #cf7f74; --cu-ink: #8c3f37; }
-.ms-root[data-fabric="starry"]    { --cu1: #5d6fa8; --cu2: #44548a; --cu-edge: #303d6b; --cu-ink: #ffe9a8; }
+.ms-root[data-fabric="knit"] {
+  --cu1: #c9dcb4; --cu2: #a9c48d; --cu-edge: #86a56a; --cu-ink: #4d6a35;
+  --cu-bg: radial-gradient(circle at 35% 30%, var(--cu1), var(--cu2) 75%);
+  --cu-shadow: inset 0 0 0 1.5px var(--cu-edge), inset 0 calc(var(--cell) * -.09) 0 rgba(0, 0, 0, .08);
+  --cu-dot: .55;
+}
+.ms-root[data-fabric="velvet"]    { --cu-bg: url("img/cushion-velvet.png") center / 100% 100% no-repeat; }
+.ms-root[data-fabric="patchwork"] { --cu-bg: url("img/cushion-patchwork.png") center / 100% 100% no-repeat; }
+.ms-root[data-fabric="starry"]    { --cu-bg: url("img/cushion-starry.png") center / 100% 100% no-repeat; }
 
 .ms-hud {
   display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: var(--s2);
@@ -61,19 +69,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 .ms-cell.cover {
-  background: radial-gradient(circle at 35% 30%, var(--cu1), var(--cu2) 75%);
-  box-shadow: inset 0 0 0 1.5px var(--cu-edge), inset 0 calc(var(--cell) * -.09) 0 rgba(0, 0, 0, .08);
-  transform: scale(.94);
+  background: var(--cu-bg);
+  box-shadow: var(--cu-shadow);
+  transform: scale(.96);
 }
 .ms-cell.cover::after {             /* the cushion's button */
-  content: ""; width: 14%; height: 14%; border-radius: 50%; background: var(--cu-edge); opacity: .55;
+  content: ""; width: 14%; height: 14%; border-radius: 50%; background: var(--cu-edge); opacity: var(--cu-dot);
 }
 .ms-cell.cover.flag::after, .ms-cell.cover.knot::after, .ms-cell.cover.reveal::after { display: none; }
 .ms-cell.cover:active { transform: scale(.86); }
 .ms-cell.open { background: var(--floor); box-shadow: inset 0 0 0 .5px var(--floor-edge); border-radius: 0; animation: ms-open 160ms var(--ease, ease-out) both; }
 .ms-cell.wall {
-  background: repeating-linear-gradient(90deg, #b98d63 0 25%, #a87c53 25% 50%);
-  box-shadow: inset 0 0 0 1.5px #8a6240; transform: scale(.94);
+  background: url("img/block.png") center / 100% 100% no-repeat; transform: scale(.94);
 }
 .ms-cell.woke { background: #fbd3d6; border-radius: 0; }
 .ms-cell.shake { animation: ms-shake 360ms ease-out; }
@@ -84,7 +91,8 @@
 .ms-cell.scan-no { outline: 3px solid #69cb67; outline-offset: -3px; }
 
 .ms-ico { width: 62%; height: 62%; fill: var(--cu-ink); pointer-events: none; }
-.ms-yarn { width: 70%; height: 70%; fill: #ef8fa6; stroke: #c9485f; pointer-events: none; }
+.ms-paw { width: 66%; height: auto; pointer-events: none; filter: drop-shadow(0 0 1.5px rgba(255, 255, 255, .9)); }
+.ms-yarn { width: 74%; height: auto; pointer-events: none; filter: drop-shadow(0 1px 1px rgba(84, 57, 62, .3)); }
 .ms-cat { width: 78%; height: 78%; pointer-events: none; }
 .ms-cat .f { fill: #f3a24b; } .ms-cat .e { stroke: #54393e; } .ms-cat .n { fill: #54393e; } .ms-cat .p { fill: #54393e; }
 .ms-cat.awake .f { fill: #e8875a; }
@@ -98,6 +106,7 @@
 }
 .ms-tool-name { max-width: 100%; text-align: center; overflow-wrap: anywhere; }
 .ms-tool .ms-ico { width: 20px; height: 20px; fill: var(--cocoa-soft); }
+.ms-tool .ms-paw { width: 22px; filter: none; }
 .ms-tool.on { background: var(--green); border-color: var(--green-deep); color: #fff; }
 .ms-tool.on .ms-ico { fill: #fff; }
 .ms-cost { display: inline-flex; align-items: center; gap: 3px; font-size: var(--fs-xs); color: var(--cocoa-soft); }

@@ -13,10 +13,8 @@ import { t, chapterName, LANGS, getLang, setLang } from './strings.js';
 const PRICE = { sniff: 60, scan: 90, catnip: 150 };
 const MAX_EXTRA_HEARTS = 2;
 
-const PAW = '<svg viewBox="0 0 24 24" class="ms-ico" aria-hidden="true"><ellipse cx="12" cy="16" rx="5.2" ry="4.3"/><ellipse cx="5.4" cy="10.4" rx="2.1" ry="2.7"/><ellipse cx="9.6" cy="6.4" rx="2.1" ry="2.8"/><ellipse cx="14.4" cy="6.4" rx="2.1" ry="2.8"/><ellipse cx="18.6" cy="10.4" rx="2.1" ry="2.7"/></svg>';
 const CAT = '<svg viewBox="0 0 24 24" class="ms-cat" aria-hidden="true"><path class="f" d="M4 5l4 3.4a8 8 0 0 1 8 0L20 5v8.5a8 8 0 0 1-16 0z"/><path class="e" d="M7.6 13.2q1.5 1.4 3 0M13.4 13.2q1.5 1.4 3 0" fill="none" stroke-width="1.3" stroke-linecap="round"/><path class="n" d="M11 15.6h2l-1 1.2z"/></svg>';
 const CAT_AWAKE = '<svg viewBox="0 0 24 24" class="ms-cat awake" aria-hidden="true"><path class="f" d="M4 5l4 3.4a8 8 0 0 1 8 0L20 5v8.5a8 8 0 0 1-16 0z"/><circle class="p" cx="9" cy="13" r="1.5"/><circle class="p" cx="15" cy="13" r="1.5"/><path class="n" d="M11 15.8h2l-1 1.2z"/></svg>';
-const YARN = '<svg viewBox="0 0 24 24" class="ms-yarn" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M5.5 9.5q6.5 1 12 6M7 16.5q4-6 10-9.5M12 4q3 8-1 16" fill="none" stroke-width="1.3" stroke-linecap="round"/></svg>';
 const HEART = '<svg viewBox="0 0 24 24" class="ms-heart" aria-hidden="true"><path d="M12 20.5S3.5 15 3.5 9.2A4.6 4.6 0 0 1 12 6.8a4.6 4.6 0 0 1 8.5 2.4C20.500 15 12 20.500 12 20.500z"/></svg>';
 
 const bits = (arr) => arr.map((v) => (v ? '1' : '0')).join('');
@@ -46,11 +44,11 @@ export default {
   },
 
   cosmetics: [
-    { id: 'gingham', name: t('fabGingham'), price: 0, note: t('fabNote') },
+    { id: 'gingham', preview: 'img/cushion-gingham.png', name: t('fabGingham'), price: 0, note: t('fabNote') },
     { id: 'knit', name: t('fabKnit'), price: 800, note: t('fabNote') },
-    { id: 'velvet', name: t('fabVelvet'), price: 1500, note: t('fabNote') },
-    { id: 'patchwork', name: t('fabPatchwork'), price: 2500, note: t('fabNote') },
-    { id: 'starry', name: t('fabStarry'), price: 4000, note: t('fabNote') },
+    { id: 'velvet', preview: 'img/cushion-velvet.png', name: t('fabVelvet'), price: 1500, note: t('fabNote') },
+    { id: 'patchwork', preview: 'img/cushion-patchwork.png', name: t('fabPatchwork'), price: 2500, note: t('fabNote') },
+    { id: 'starry', preview: 'img/cushion-starry.png', name: t('fabStarry'), price: 4000, note: t('fabNote') },
   ],
 
   // Never reward spending: no booster tasks.
@@ -120,8 +118,11 @@ export default {
       <div class="ms-tools" data-tools></div>`;
     const $ = (s) => root.querySelector(s);
     const elBoard = $('[data-board]');
+    const PAW_IMG = `<img class="ms-paw" src="${host.asset('img/paw.png')}" alt="" draggable="false">`;
+    const YARN_IMG = `<img class="ms-yarn" src="${host.asset('img/yarn.png')}" alt="" draggable="false">`;
     const elWrap = $('[data-wrap]');
     let cells = [];
+    let drawn = [];                     // what each cushion last showed, so art is not reloaded on every draw
 
     /* ---------------- drawing ---------------- */
 
@@ -145,6 +146,7 @@ export default {
     function build() {
       elBoard.innerHTML = board.cat.map((_, i) => `<button class="ms-cell" data-i="${i}"></button>`).join('');
       cells = [...elBoard.children];
+      drawn = [];
       fit();
     }
 
@@ -156,13 +158,13 @@ export default {
       else if (open[i]) { cls += ' open'; if (board.num[i] > 0) { cls += ` n${board.num[i]}`; html = String(board.num[i]); } }
       else {
         cls += ' cover';
-        if (flag[i]) { cls += ' flag'; html = PAW; }
-        else if (knot[i]) { cls += ' knot'; html = YARN; }
+        if (flag[i]) { cls += ' flag'; html = PAW_IMG; }
+        else if (knot[i]) { cls += ' knot'; html = YARN_IMG; }
         else if (over && board.cat[i]) { cls += ' reveal'; html = CAT; }
       }
       if (scanMarks?.cells.includes(i)) cls += scanMarks.hit ? ' scan-yes' : ' scan-no';
       if (el.className !== cls) el.className = cls;
-      if (el.innerHTML !== html) el.innerHTML = html;
+      if (drawn[i] !== html) { drawn[i] = html; el.innerHTML = html; }
     }
 
     function tipText() {
@@ -194,7 +196,7 @@ export default {
         ? `<span class="ms-cost free">${t('free')} ×${free[b]}</span>`
         : `<span class="ms-cost">${host.art.coin(13)}${price(b)}</span>`);
       let html = '';
-      if (level >= UNLOCK.paw) html += tool('paw', t('paw'), PAW, pawMode, 'paw');
+      if (level >= UNLOCK.paw) html += tool('paw', t('paw'), PAW_IMG, pawMode, 'paw');
       if (level >= UNLOCK.sniff) html += tool('sniff', t('sniff'), cost('sniff'), false);
       if (level >= UNLOCK.scan) html += tool('scan', t('scan'), cost('scan'), target === 'scan');
       if (level >= UNLOCK.catnip) html += tool('catnip', t('catnip'), cost('catnip'), target === 'catnip');
