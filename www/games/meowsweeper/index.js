@@ -15,7 +15,6 @@ const MAX_EXTRA_HEARTS = 2;
 
 const CAT = '<svg viewBox="0 0 24 24" class="ms-cat" aria-hidden="true"><path class="f" d="M4 5l4 3.4a8 8 0 0 1 8 0L20 5v8.5a8 8 0 0 1-16 0z"/><path class="e" d="M7.6 13.2q1.5 1.4 3 0M13.4 13.2q1.5 1.4 3 0" fill="none" stroke-width="1.3" stroke-linecap="round"/><path class="n" d="M11 15.6h2l-1 1.2z"/></svg>';
 const CAT_AWAKE = '<svg viewBox="0 0 24 24" class="ms-cat awake" aria-hidden="true"><path class="f" d="M4 5l4 3.4a8 8 0 0 1 8 0L20 5v8.5a8 8 0 0 1-16 0z"/><circle class="p" cx="9" cy="13" r="1.5"/><circle class="p" cx="15" cy="13" r="1.5"/><path class="n" d="M11 15.8h2l-1 1.2z"/></svg>';
-const HEART = '<svg viewBox="0 0 24 24" class="ms-heart" aria-hidden="true"><path d="M12 20.5S3.5 15 3.5 9.2A4.6 4.6 0 0 1 12 6.8a4.6 4.6 0 0 1 8.5 2.4C20.500 15 12 20.500 12 20.500z"/></svg>';
 
 const bits = (arr) => arr.map((v) => (v ? '1' : '0')).join('');
 const unbits = (s, n) => Array.from({ length: n }, (_, i) => s?.[i] === '1');
@@ -45,7 +44,7 @@ export default {
 
   cosmetics: [
     { id: 'gingham', preview: 'img/cushion-gingham.png', name: t('fabGingham'), price: 0, note: t('fabNote') },
-    { id: 'knit', name: t('fabKnit'), price: 800, note: t('fabNote') },
+    { id: 'knit', preview: 'img/cushion-knit.png', name: t('fabKnit'), price: 800, note: t('fabNote') },
     { id: 'velvet', preview: 'img/cushion-velvet.png', name: t('fabVelvet'), price: 1500, note: t('fabNote') },
     { id: 'patchwork', preview: 'img/cushion-patchwork.png', name: t('fabPatchwork'), price: 2500, note: t('fabNote') },
     { id: 'starry', preview: 'img/cushion-starry.png', name: t('fabStarry'), price: 4000, note: t('fabNote') },
@@ -119,6 +118,12 @@ export default {
     const $ = (s) => root.querySelector(s);
     const elBoard = $('[data-board]');
     const PAW_IMG = `<img class="ms-paw" src="${host.asset('img/paw.png')}" alt="" draggable="false">`;
+    const HEART = `<img class="ms-heart" src="${host.asset('img/heart.png')}" alt="" draggable="false">`;
+    const ICON = {
+      sniff: `<img class="ms-tool-ico" src="${host.asset('img/icon-sniff.png')}" alt="" draggable="false">`,
+      scan: `<img class="ms-tool-ico" src="${host.asset('img/icon-scan.png')}" alt="" draggable="false">`,
+      catnip: `<img class="ms-tool-ico" src="${host.asset('img/icon-catnip.png')}" alt="" draggable="false">`,
+    };
     const YARN_IMG = `<img class="ms-yarn" src="${host.asset('img/yarn.png')}" alt="" draggable="false">`;
     const elWrap = $('[data-wrap]');
     let cells = [];
@@ -191,7 +196,7 @@ export default {
       tip.classList.toggle('alert', !!note);
 
       const tool = (id, label, body, on, extraCls = '') =>
-        `<button class="ms-tool ${extraCls} ${on ? 'on' : ''}" data-tool="${id}"><span class="ms-tool-name">${label}</span>${body}</button>`;
+        `<button class="ms-tool ${extraCls} ${on ? 'on' : ''}" data-tool="${id}">${ICON[id] || ''}<span class="ms-tool-name">${label}</span>${body}</button>`;
       const cost = (b) => (free[b] > 0
         ? `<span class="ms-cost free">${t('free')} ×${free[b]}</span>`
         : `<span class="ms-cost">${host.art.coin(13)}${price(b)}</span>`);
