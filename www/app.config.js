@@ -3,7 +3,7 @@
 // JSON after "export default": Gradle parses it with a JSON reader.
 // versionCode must go up for every Play upload.
 export default {
-  "name": "My Game",
+  "name": "Meowsweeper",
   "applicationId": "com.example.mygame",
   "versionCode": 1,
   "versionName": "1.0.0",

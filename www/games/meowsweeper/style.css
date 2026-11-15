@@ -1,0 +1,110 @@
+/* Meowsweeper. Scoped under .ms-root, the element the shell hands this game. */
+
+.ms-root {
+  --cu1: #fbd9a8; --cu2: #f3bd7c; --cu-edge: #d89a55; --cu-ink: #8a5a2b;
+  --floor: #fffaf0; --floor-edge: #eadfc9;
+  padding: var(--s2) var(--s3) var(--s3);
+  gap: var(--s2);
+  user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.ms-root[data-fabric="knit"]      { --cu1: #c9dcb4; --cu2: #a9c48d; --cu-edge: #86a56a; --cu-ink: #4d6a35; }
+.ms-root[data-fabric="velvet"]    { --cu1: #cdb8ec; --cu2: #ab90d8; --cu-edge: #8a6fc0; --cu-ink: #513a86; }
+.ms-root[data-fabric="patchwork"] { --cu1: #f6c1c0; --cu2: #f0a59a; --cu-edge: #cf7f74; --cu-ink: #8c3f37; }
+.ms-root[data-fabric="starry"]    { --cu1: #5d6fa8; --cu2: #44548a; --cu-edge: #303d6b; --cu-ink: #ffe9a8; }
+
+.ms-hud {
+  display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: var(--s2);
+  font-weight: 800; color: var(--cocoa);
+}
+.ms-hearts { display: flex; gap: 2px; }
+.ms-heart { width: 22px; height: 22px; display: block; }
+.ms-hearts .on .ms-heart { fill: #e8607a; }
+.ms-hearts .off .ms-heart { fill: #e6d8c6; }
+.ms-mid { min-width: 0; display: flex; align-items: center; justify-content: center; gap: var(--s2); font-size: var(--fs-sm); }
+.ms-mid span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ms-badge {
+  flex: none; padding: 2px 8px; border-radius: var(--r-pill);
+  background: #e8607a; color: #fff; font-size: var(--fs-xs); letter-spacing: .04em; text-transform: uppercase;
+}
+.ms-left { display: flex; align-items: center; gap: 4px; font-size: var(--fs-md); }
+.ms-left .ms-cat { width: 22px; height: 22px; }
+.ms-lang {
+  border: 2px solid rgba(120, 80, 68, .18); border-radius: var(--r-pill); background: rgba(255, 255, 255, .6);
+  padding: 3px 9px; font: 800 var(--fs-xs)/1.2 var(--font); color: var(--cocoa-soft);
+}
+.ms-langs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.ms-langs[hidden] { display: none; }
+.ms-langs button {
+  border: 2px solid rgba(120, 80, 68, .16); border-radius: var(--r-pill); background: #fff;
+  padding: 5px 12px; font: 700 var(--fs-sm)/1.2 var(--font), "Noto Sans Devanagari", sans-serif; color: var(--cocoa);
+}
+.ms-langs button.on { background: var(--green); border-color: var(--green); color: #fff; }
+
+.ms-tip {
+  margin: 0; min-height: 2.6em; display: grid; place-items: center; text-align: center;
+  font-size: var(--fs-sm); font-weight: 700; line-height: 1.3; color: #9a8573;
+}
+.ms-tip.alert { color: #c9485f; }
+
+.ms-wrap { flex: 1 1 0; min-height: 0; display: grid; place-items: center; }
+.ms-board {
+  display: grid; gap: 0; padding: 4px; border-radius: var(--r-md);
+  background: var(--floor-edge); box-shadow: 0 2px 0 rgba(84, 57, 62, .12);
+  touch-action: manipulation;
+}
+.ms-cell {
+  width: var(--cell); height: var(--cell); padding: 0; border: 0; margin: 0;
+  display: grid; place-items: center; position: relative;
+  font: 900 calc(var(--cell) * .56)/1 var(--font); color: var(--ink);
+  background: none; border-radius: calc(var(--cell) * .24);
+  -webkit-tap-highlight-color: transparent;
+}
+.ms-cell.cover {
+  background: radial-gradient(circle at 35% 30%, var(--cu1), var(--cu2) 75%);
+  box-shadow: inset 0 0 0 1.5px var(--cu-edge), inset 0 calc(var(--cell) * -.09) 0 rgba(0, 0, 0, .08);
+  transform: scale(.94);
+}
+.ms-cell.cover::after {             /* the cushion's button */
+  content: ""; width: 14%; height: 14%; border-radius: 50%; background: var(--cu-edge); opacity: .55;
+}
+.ms-cell.cover.flag::after, .ms-cell.cover.knot::after, .ms-cell.cover.reveal::after { display: none; }
+.ms-cell.cover:active { transform: scale(.86); }
+.ms-cell.open { background: var(--floor); box-shadow: inset 0 0 0 .5px var(--floor-edge); border-radius: 0; animation: ms-open 160ms var(--ease, ease-out) both; }
+.ms-cell.wall {
+  background: repeating-linear-gradient(90deg, #b98d63 0 25%, #a87c53 25% 50%);
+  box-shadow: inset 0 0 0 1.5px #8a6240; transform: scale(.94);
+}
+.ms-cell.woke { background: #fbd3d6; border-radius: 0; }
+.ms-cell.shake { animation: ms-shake 360ms ease-out; }
+.ms-cell.n1 { color: #3f7fca; } .ms-cell.n2 { color: #3f9a55; } .ms-cell.n3 { color: #e0762b; }
+.ms-cell.n4 { color: #7d5fc7; } .ms-cell.n5 { color: #cf4257; } .ms-cell.n6 { color: #2f9c9c; }
+.ms-cell.n7 { color: #54393e; } .ms-cell.n8 { color: #8b8f95; }
+.ms-cell.scan-yes { outline: 3px solid #e8607a; outline-offset: -3px; }
+.ms-cell.scan-no { outline: 3px solid #69cb67; outline-offset: -3px; }
+
+.ms-ico { width: 62%; height: 62%; fill: var(--cu-ink); pointer-events: none; }
+.ms-yarn { width: 70%; height: 70%; fill: #ef8fa6; stroke: #c9485f; pointer-events: none; }
+.ms-cat { width: 78%; height: 78%; pointer-events: none; }
+.ms-cat .f { fill: #f3a24b; } .ms-cat .e { stroke: #54393e; } .ms-cat .n { fill: #54393e; } .ms-cat .p { fill: #54393e; }
+.ms-cat.awake .f { fill: #e8875a; }
+
+.ms-tools { display: flex; gap: var(--s2); justify-content: center; min-height: 58px; }
+.ms-tool {
+  flex: 1 1 0; max-width: 110px; min-width: 0; padding: 6px 4px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border: 2px solid rgba(120, 80, 68, .16); border-radius: var(--r-md); background: rgba(255, 255, 255, .7);
+  font: 800 var(--fs-xs)/1.15 var(--font), "Noto Sans Devanagari", sans-serif; color: var(--cocoa);
+}
+.ms-tool-name { max-width: 100%; text-align: center; overflow-wrap: anywhere; }
+.ms-tool .ms-ico { width: 20px; height: 20px; fill: var(--cocoa-soft); }
+.ms-tool.on { background: var(--green); border-color: var(--green-deep); color: #fff; }
+.ms-tool.on .ms-ico { fill: #fff; }
+.ms-cost { display: inline-flex; align-items: center; gap: 3px; font-size: var(--fs-xs); color: var(--cocoa-soft); }
+.ms-cost.free { color: var(--green); }
+.ms-tool.on .ms-cost { color: #fff; }
+.ms-tool:active { transform: scale(.96); }
+
+@keyframes ms-open { from { transform: scale(.7); opacity: .3; } to { transform: none; opacity: 1; } }
+@keyframes ms-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-3px) rotate(-4deg); } 60% { transform: translateX(3px) rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { .ms-cell.open, .ms-cell.shake { animation: none; } }

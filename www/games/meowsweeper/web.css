@@ -1,0 +1,2 @@
+/* PC: a pointer is more exact than a thumb, so cushions can show a hover. */
+.ms-cell.cover:hover { filter: brightness(1.05); }
