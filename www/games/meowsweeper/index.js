@@ -105,6 +105,10 @@ export default {
     let noteTimer = null;
     let scanMarks = null;
     let langOpen = false;
+    // A shell that has languages (host.locale) owns the choice: the game follows it and
+    // its own picker goes away, since Settings has one. An older shell leaves it to the game.
+    const shellOwnsLang = typeof host.locale === 'function';
+    if (shellOwnsLang) setLang(host.locale(), { remember: false });
 
     root.innerHTML = `
       <div class="ms-hud">
@@ -189,6 +193,7 @@ export default {
       badge.textContent = spec.boss ? t('boss') : t('hard');
       $('[data-left]').innerHTML = `${CAT}<b>${Math.max(0, catsLeft())}</b>`;
       $('[data-left]').setAttribute('aria-label', t('catsLeft'));
+      $('[data-lang]').hidden = shellOwnsLang;
       $('[data-lang]').textContent = getLang().toUpperCase();
       const langs = $('[data-langs]');
       langs.hidden = !langOpen;

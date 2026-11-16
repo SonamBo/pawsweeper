@@ -209,7 +209,22 @@ const fr = {
 const TABLES = { en, es, pt, hi, de, fr };
 const KEY = 'meowsweeper.lang';
 
+/**
+ * A shell with languages of its own (1.23.0 on) puts the app's language on
+ * <html lang> before this file runs, and that is the one to follow. An older
+ * shell leaves the page in English, and the game then keeps its own choice.
+ */
+function shellLang() {
+  try {
+    const page = globalThis.document?.documentElement?.lang || '';
+    if (TABLES[page] && (page !== 'en' || localStorage.getItem('cashpaws.lang'))) return page;
+  } catch { /* no storage */ }
+  return null;
+}
+
 function initial() {
+  const fromShell = shellLang();
+  if (fromShell) return fromShell;
   try { const s = localStorage.getItem(KEY); if (s && TABLES[s]) return s; } catch { /* no storage */ }
   const nav = (globalThis.navigator?.language || 'en').slice(0, 2).toLowerCase();
   return TABLES[nav] ? nav : 'en';
@@ -217,9 +232,10 @@ function initial() {
 
 let lang = initial();
 export const getLang = () => lang;
-export function setLang(id) {
+export function setLang(id, { remember = true } = {}) {
   if (!TABLES[id]) return;
   lang = id;
+  if (!remember) return;
   try { localStorage.setItem(KEY, id); } catch { /* no storage */ }
 }
 

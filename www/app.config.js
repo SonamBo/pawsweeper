@@ -9,6 +9,7 @@ export default {
   "versionName": "1.0.0",
   "privacyUrl": "https://pixelartgames000.github.io/privacy-policy/",
   "contactEmail": "pixelartgames000@gmail.com",
+  "languages": ["en", "es", "pt", "hi", "de", "fr"],
   "coinPacks": [
     { "id": "coins_500", "coins": 500, "name": "Pocket change" },
     { "id": "coins_1200", "coins": 1200, "name": "Coin purse" },
