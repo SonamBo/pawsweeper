@@ -12,6 +12,8 @@ import { t, chapterName, LANGS, getLang, setLang } from './strings.js';
 
 const PRICE = { sniff: 60, scan: 90, catnip: 150 };
 const MAX_EXTRA_HEARTS = 2;
+/** Chapters that have their own room picture (img/room-<chapter>.jpg). */
+const ROOMS = 12;
 
 const CAT = '<svg viewBox="0 0 24 24" class="ms-cat" aria-hidden="true"><path class="f" d="M4 5l4 3.4a8 8 0 0 1 8 0L20 5v8.5a8 8 0 0 1-16 0z"/><path class="e" d="M7.6 13.2q1.5 1.4 3 0M13.4 13.2q1.5 1.4 3 0" fill="none" stroke-width="1.3" stroke-linecap="round"/><path class="n" d="M11 15.6h2l-1 1.2z"/></svg>';
 const CAT_AWAKE = '<svg viewBox="0 0 24 24" class="ms-cat awake" aria-hidden="true"><path class="f" d="M4 5l4 3.4a8 8 0 0 1 8 0L20 5v8.5a8 8 0 0 1-16 0z"/><circle class="p" cx="9" cy="13" r="1.5"/><circle class="p" cx="15" cy="13" r="1.5"/><path class="n" d="M11 15.8h2l-1 1.2z"/></svg>';
@@ -207,6 +209,7 @@ export default {
       if (level >= UNLOCK.catnip) html += tool('catnip', t('catnip'), cost('catnip'), target === 'catnip');
       $('[data-tools]').innerHTML = html;
       root.classList.toggle('hard', !!spec.hard);
+      if (spec.chapter <= ROOMS) root.dataset.room = spec.chapter; else delete root.dataset.room;
     }
 
     function report() {

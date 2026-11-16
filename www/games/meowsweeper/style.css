@@ -118,3 +118,17 @@
 .logo { width: min(330px, 88vw); }
 #app.short .logo { width: min(290px, 80vw); }
 #app.xshort .logo { width: min(240px, 70vw); }
+
+/* Rooms: each chapter's picture replaces the shell's room behind the header and the board. */
+.screen:has(.ms-root[data-room="1"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-1.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="2"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-2.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="3"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-3.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="4"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-4.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="5"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-5.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="6"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-6.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="7"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-7.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="8"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-8.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="9"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-9.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="10"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-10.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="11"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-11.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="12"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-12.jpg") center bottom / cover no-repeat, var(--ground); }
