@@ -120,15 +120,113 @@
 #app.xshort .logo { width: min(240px, 70vw); }
 
 /* Rooms: each chapter's picture replaces the shell's room behind the header and the board. */
-.screen:has(.ms-root[data-room="1"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-1.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="2"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-2.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="3"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-3.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="4"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-4.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="5"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-5.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="6"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-6.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="7"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-7.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="8"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-8.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="9"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-9.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="10"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-10.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="11"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-11.jpg") center bottom / cover no-repeat, var(--ground); }
-.screen:has(.ms-root[data-room="12"]) { background: linear-gradient(rgba(255, 250, 240, .72) 0, rgba(255, 250, 240, .6) 150px, rgba(255, 250, 240, 0) 240px), url("img/room-12.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="1"]) { background: url("img/room-1.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="2"]) { background: url("img/room-2.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="3"]) { background: url("img/room-3.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="4"]) { background: url("img/room-4.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="5"]) { background: url("img/room-5.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="6"]) { background: url("img/room-6.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="7"]) { background: url("img/room-7.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="8"]) { background: url("img/room-8.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="9"]) { background: url("img/room-9.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="10"]) { background: url("img/room-10.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="11"]) { background: url("img/room-11.jpg") center bottom / cover no-repeat, var(--ground); }
+.screen:has(.ms-root[data-room="12"]) { background: url("img/room-12.jpg") center bottom / cover no-repeat, var(--ground); }
+
+/* ================================================================ *
+ * The pastel look: chunky cream panels with a soft "pressed" edge.
+ * The header is the shell's, so its rules here apply only while this
+ * game is on screen.
+ * ================================================================ */
+.ms-root, .screen:has(.ms-root) {
+  --pn: #fff7ea; --pn-edge: #efd6b3; --pn-drop: #dfbd92; --sign: #f9dfb9; --sign-edge: #e6bd8d; --sign-drop: #d2a273;
+}
+
+.screen:has(.ms-root) .hdr { position: relative; padding-bottom: var(--s3); }
+.screen:has(.ms-root) .hdr-top { height: 46px; margin-bottom: 6px; position: relative; z-index: 1; }
+.screen:has(.ms-root) .coins {
+  background: var(--pn); border: 2.5px solid var(--pn-edge); box-shadow: 0 3px 0 var(--pn-drop);
+  padding: 5px 6px 5px 8px; gap: 10px;
+}
+.screen:has(.ms-root) .coins-n { font-size: 19px; color: var(--cocoa); }
+.screen:has(.ms-root) .coins-add { width: 26px; height: 26px; background: #f5a53a; box-shadow: inset 0 -2px 0 rgba(160, 90, 20, .25); }
+.screen:has(.ms-root) .pause-btn {
+  width: 44px; height: 44px; border-radius: 16px; margin-right: 0;
+  background: var(--pn); border: 2.5px solid var(--pn-edge); box-shadow: 0 3px 0 var(--pn-drop);
+}
+/* The plaque behind the bar and the figures, and the level name as a little wooden sign on its top edge. */
+.screen:has(.ms-root) .hdr::after {
+  content: ""; position: absolute; z-index: 0; left: 26px; right: 26px; bottom: 4px;
+  top: calc(var(--s4) + var(--safe-top) + 46px + 6px + 20px);
+  background: var(--pn); border: 2.5px solid var(--pn-edge); border-radius: 34px;
+  box-shadow: 0 4px 0 var(--pn-drop), 0 10px 18px rgba(150, 100, 60, .14);
+}
+.screen:has(.ms-root) .hdr > :not(.hdr-top) { position: relative; z-index: 1; }
+.screen:has(.ms-root) .level-title {
+  display: inline-block; margin: 0 0 10px; padding: 3px 44px 4px; min-width: 190px;
+  font-size: 24px; font-weight: 900;
+  background:
+    url("img/paw.png") left 14px center / 20px auto no-repeat,
+    url("img/paw.png") right 14px center / 20px auto no-repeat,
+    var(--sign);
+  background-blend-mode: soft-light, soft-light, normal;
+  border: 2.5px solid var(--sign-edge); border-radius: 14px; box-shadow: 0 3px 0 var(--sign-drop);
+}
+.screen:has(.ms-root) .bar {
+  height: 20px; margin: 0 52px 8px; background: #eedfcb;
+  box-shadow: inset 0 2px 0 rgba(150, 110, 70, .16); border: 2px solid #e3cfb4; box-sizing: content-box;
+}
+.screen:has(.ms-root) .bar-fill { background: linear-gradient(#8fe07c, #5fc65c); box-shadow: inset 0 2px 0 rgba(255, 255, 255, .35); }
+.screen:has(.ms-root) .bar-figure { font-size: 20px; font-weight: 900; color: var(--cocoa); }
+.screen:has(.ms-root) .bar-sub { margin-bottom: 6px; color: #a98f7a; }
+
+.ms-root { padding-top: 2px; }
+.ms-heart { width: 32px; filter: drop-shadow(0 2px 0 rgba(160, 40, 60, .22)); }
+.ms-hearts { gap: 3px; }
+.ms-left, .ms-lang {
+  background: var(--pn); border: 2.5px solid var(--pn-edge); box-shadow: 0 3px 0 var(--pn-drop);
+  border-radius: var(--r-pill); min-height: 36px; padding: 0 12px; color: var(--cocoa);
+}
+.ms-left { gap: 7px; font-size: 19px; font-weight: 900; }
+.ms-left .ms-cat { width: 24px; height: 24px; }
+.ms-lang { font-size: var(--fs-sm); font-weight: 900; }
+.ms-tip { color: #8a705f; text-shadow: 0 0 6px #fff, 0 0 6px #fff, 0 0 3px #fff; }
+
+.ms-board {
+  padding: 9px; border-radius: 24px; background: var(--pn);
+  border: 3px solid var(--pn-edge);
+  box-shadow: 0 5px 0 var(--pn-drop), 0 14px 22px rgba(150, 100, 60, .18);
+}
+.ms-cell { font-size: calc(var(--cell) * .62); }
+.ms-cell.open {
+  background: #fffdf7; border-radius: calc(var(--cell) * .08);
+  box-shadow: inset 0 0 0 1.5px #f4e8d6;
+}
+.ms-cell.woke { border-radius: calc(var(--cell) * .08); }
+.ms-cell.cover { transform: scale(.97); filter: drop-shadow(0 1.5px 0 rgba(176, 106, 56, .28)); }
+/* A paw pressed into every cushion. */
+.ms-cell.cover::after {
+  content: ""; width: 50%; height: 50%; border-radius: 0; opacity: .5; background: #fff;
+  -webkit-mask: url("img/paw.png") center / contain no-repeat; mask: url("img/paw.png") center / contain no-repeat;
+}
+.ms-paw { width: 62%; filter: none; }
+
+.ms-tools { gap: 10px; min-height: 70px; padding-bottom: 2px; }
+.ms-tool {
+  max-width: 150px; padding: 7px 6px; gap: 3px; border-radius: 24px;
+  background: var(--pn); border: 2.5px solid var(--pn-edge); box-shadow: 0 4px 0 var(--pn-drop);
+  font-size: var(--fs-sm); font-weight: 900;
+}
+.ms-tool .ms-paw { width: 28px; }
+.ms-tool-ico { height: 30px; }
+.ms-tool:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--pn-drop); }
+.ms-tool.on { background: #7fd36f; border-color: #57b352; box-shadow: 0 4px 0 #469a45; color: #fff; }
+.ms-cost { font-weight: 800; }
+.ms-cost.free { color: #3f9a55; }
+.ms-cell.cover::after { opacity: .62; }
+.ms-tool-name { overflow-wrap: break-word; hyphens: auto; }
+.ms-tools:has(.ms-tool:nth-child(4)) .ms-tool { font-size: var(--fs-xs); padding: 6px 3px; }
+/* Tall boards need the height: the plaque drops the room's name. */
+.screen:has(.ms-root.tall) .bar-sub { display: none; }
+.screen:has(.ms-root.tall) .bar-figure { margin-bottom: 8px; }
+.ms-root.tall .ms-tip { min-height: 1.4em; }

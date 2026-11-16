@@ -143,7 +143,7 @@ export default {
 
     function fit() {
       if (!board) return;
-      const w = elWrap.clientWidth - 8, h = elWrap.clientHeight - 8;
+      const w = elWrap.clientWidth - 30, h = elWrap.clientHeight - 36;   // the board's frame and its drop shadow
       if (w <= 0 || h <= 0) return;
       const size = Math.max(18, Math.min(52, Math.floor(Math.min(w / board.cols, h / board.rows))));
       elBoard.style.setProperty('--cell', `${size}px`);
@@ -209,6 +209,7 @@ export default {
       if (level >= UNLOCK.catnip) html += tool('catnip', t('catnip'), cost('catnip'), target === 'catnip');
       $('[data-tools]').innerHTML = html;
       root.classList.toggle('hard', !!spec.hard);
+      root.classList.toggle('tall', spec.rows >= 13);
       if (spec.chapter <= ROOMS) root.dataset.room = spec.chapter; else delete root.dataset.room;
     }
 
