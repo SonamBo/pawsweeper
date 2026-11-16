@@ -13,7 +13,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, posix } from 'node:path';
 const posixJoin = (from, spec) => posix.normalize(posix.join(posix.dirname(from), spec));
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const fails = [];
@@ -27,6 +27,9 @@ const CASH_PAWS = {
   privacyHost: 'pixelartgames000.github.io',
   firebaseProject: 'cash-paws-prod',
   admobPublisher: '5379524261124242',
+  admobApp: '~4778314769',                 // Cash Paws' own app and units within that account
+  admobUnits: ['/4914046139', '/7986846311'],
+  studioPrefix: 'com.pixelartgames.',      // the studio's other apps share its account, policy page and address
 };
 let APP = {};
 {
@@ -74,10 +77,15 @@ let APP = {};
 }
 // An app built from this shell that isn't Cash Paws must not ship anything of Cash Paws'.
 const IS_CASH_PAWS = APP.applicationId === CASH_PAWS.applicationId;
+// Another app by the same studio (same package prefix) may share the AdMob
+// account, the privacy-policy site and the support address. It still needs
+// its own name, its own Firebase project and its own AdMob app and ad units.
+const SAME_STUDIO = !IS_CASH_PAWS && (APP.applicationId || '').startsWith(CASH_PAWS.studioPrefix);
 if (APP.applicationId && !IS_CASH_PAWS) {
   if (APP.name === CASH_PAWS.name) fails.push('IDENTITY www/app.config.js still names the app "Cash Paws"');
-  if ((APP.privacyUrl || '').includes(CASH_PAWS.privacyHost)) fails.push('IDENTITY privacyUrl points at Cash Paws\' privacy policy — publish your own');
-  if ((APP.contactEmail || '').includes('pixelartgames000')) fails.push('IDENTITY contactEmail is Cash Paws\' address');
+  if (!SAME_STUDIO && (APP.privacyUrl || '').includes(CASH_PAWS.privacyHost)) fails.push('IDENTITY privacyUrl points at Cash Paws\' privacy policy — publish your own');
+  if (!SAME_STUDIO && (APP.contactEmail || '').includes('pixelartgames000')) fails.push('IDENTITY contactEmail is Cash Paws\' address');
+  if (SAME_STUDIO) notes.push('same studio as Cash Paws: sharing its AdMob account, privacy-policy site and support address is allowed. Make sure the policy page names this app too.');
 }
 
 function need(rel, why) {
@@ -221,7 +229,8 @@ needContains('android/app/src/main/java/com/pixelartgames/cashpaw/MainActivity.k
   if (unit && !appId) fails.push('CONTENT  ads.properties has an ad unit but no appId: release ads would never serve');
   if (/3940256099942544/.test(props)) fails.push('CONTENT  ads.properties holds Google\'s TEST IDs: release builds must use your own');
   notes.push(unit ? `ads: release builds serve AdMob unit ${unit}` : 'ads: no android/ads.properties or no ad unit in it — release builds show no ads (debug uses Google\'s test ads)');
-  if (!IS_CASH_PAWS && props.includes(CASH_PAWS.admobPublisher)) fails.push('IDENTITY android/ads.properties holds Cash Paws\' AdMob IDs — use your own account\'s');
+  if (!IS_CASH_PAWS && !SAME_STUDIO && props.includes(CASH_PAWS.admobPublisher)) fails.push('IDENTITY android/ads.properties holds Cash Paws\' AdMob IDs — use your own account\'s');
+  if (SAME_STUDIO && [CASH_PAWS.admobApp, ...CASH_PAWS.admobUnits].some((id) => props.includes(id))) fails.push('IDENTITY android/ads.properties holds Cash Paws\' own AdMob app or ad units — create this app\'s own in the same account');
   // Interstitials (1.13): well-formed, same account, test unit in debug, and
   // no listing or policy that still promises every ad is optional.
   const inter = props.match(/^interstitialAdUnit=(\S*)/m)?.[1] || '';
@@ -419,6 +428,24 @@ if (existsSync(join(ROOT, 'www/games/money-sort'))) for (const v of [1, 5, 10, 2
   for (const r of refs) need(`www/${r}`, 'referenced by the shell');
   notes.push(`${refs.size} shell image references checked`);
 }
+
+/* --- Remote Config (1.19.0): the game's `remote` keys must be valid, with defaults inside their limits --- */
+{
+  const active = readFileSync(join(ROOT, 'www/games/active.js'), 'utf8').match(/from\s+['"]\.\/([^/'"]+)\//)?.[1];
+  try {
+    const { checkSpecs, SHELL_KEYS } = await import(pathToFileURL(join(ROOT, 'www/shell/config.js')).href);
+    const game = (await import(pathToFileURL(join(ROOT, `www/games/${active}/index.js`)).href)).default;
+    for (const p of [...checkSpecs(SHELL_KEYS), ...checkSpecs(game.remote || {})]) fails.push(`CONFIG   ${p}`);
+    for (const k of Object.keys(game.remote || {})) {
+      if (k in SHELL_KEYS) fails.push(`CONFIG   ${active} declares remote key ${k}, which the shell already owns`);
+    }
+    notes.push(`${Object.keys(SHELL_KEYS).length} shell and ${Object.keys(game.remote || {}).length} game Remote Config keys checked`);
+  } catch (e) {
+    notes.push(`Remote Config keys not checked (the game would not load in Node: ${String(e.message).slice(0, 80)})`);
+  }
+}
+needContains('android/app/build.gradle', 'firebase-config', 'Remote Config needs its Firebase library');
+need('android/app/src/main/java/com/pixelartgames/cashpaw/RemoteConfig.java', 'the Remote Config bridge (window.CashPawsConfig)');
 
 /* --- the version the app reports is the one Play sees: both from app.config.js --- */
 needContains('www/shell/main.js', 'APP.versionName', 'the shell must take its version from www/app.config.js');
