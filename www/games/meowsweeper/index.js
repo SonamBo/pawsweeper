@@ -16,7 +16,7 @@ const MAX_EXTRA_HEARTS = 2;
 const ROOMS = 12;
 
 const CAT = '<svg viewBox="0 0 24 24" class="ms-cat" aria-hidden="true"><path class="f" d="M4 5l4 3.4a8 8 0 0 1 8 0L20 5v8.5a8 8 0 0 1-16 0z"/><path class="e" d="M7.6 13.2q1.5 1.4 3 0M13.4 13.2q1.5 1.4 3 0" fill="none" stroke-width="1.3" stroke-linecap="round"/><path class="n" d="M11 15.6h2l-1 1.2z"/></svg>';
-const CAT_AWAKE = '<svg viewBox="0 0 24 24" class="ms-cat awake" aria-hidden="true"><path class="f" d="M4 5l4 3.4a8 8 0 0 1 8 0L20 5v8.5a8 8 0 0 1-16 0z"/><circle class="p" cx="9" cy="13" r="1.5"/><circle class="p" cx="15" cy="13" r="1.5"/><path class="n" d="M11 15.8h2l-1 1.2z"/></svg>';
+const COATS = ['patch', 'mittens', 'soot', 'marmalade', 'pepper', 'biscuit'];
 
 const bits = (arr) => arr.map((v) => (v ? '1' : '0')).join('');
 const unbits = (s, n) => Array.from({ length: n }, (_, i) => s?.[i] === '1');
@@ -161,17 +161,21 @@ export default {
       fit();
     }
 
+    /** Each hidden cat keeps one coat for the whole board. */
+    const catImg = (i, pose) =>
+      `<img class="ms-catimg ${pose}" src="${host.asset(`img/cat-${COATS[(i * 7 + level) % COATS.length]}-${pose}.png`)}" alt="" draggable="false">`;
+
     function drawCell(i) {
       const el = cells[i];
       let cls = 'ms-cell', html = '';
       if (board.wall[i]) cls += ' wall';
-      else if (woke[i]) { cls += ' woke'; html = CAT_AWAKE; }
+      else if (woke[i]) { cls += ' woke'; html = catImg(i, 'startled'); }
       else if (open[i]) { cls += ' open'; if (board.num[i] > 0) { cls += ` n${board.num[i]}`; html = String(board.num[i]); } }
       else {
         cls += ' cover';
         if (flag[i]) { cls += ' flag'; html = PAW_IMG; }
         else if (knot[i]) { cls += ' knot'; html = YARN_IMG; }
-        else if (over && board.cat[i]) { cls += ' reveal'; html = CAT; }
+        else if (over && board.cat[i]) { cls += ' reveal'; html = catImg(i, 'sleep'); }
       }
       if (scanMarks?.cells.includes(i)) cls += scanMarks.hit ? ' scan-yes' : ' scan-no';
       if (el.className !== cls) el.className = cls;

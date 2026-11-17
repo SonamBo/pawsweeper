@@ -231,3 +231,8 @@
 .screen:has(.ms-root.tall) .bar-figure { margin-bottom: 8px; }
 .ms-root.tall .ms-tip { min-height: 1.4em; }
 .ms-lang[hidden] { display: none; }
+
+/* Cat art on the board: asleep where one was hiding, startled where one woke. */
+.ms-catimg { pointer-events: none; display: block; }
+.ms-catimg.sleep { width: 92%; height: auto; }
+.ms-catimg.startled { width: 88%; height: auto; align-self: end; }
