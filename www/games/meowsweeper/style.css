@@ -236,3 +236,8 @@
 .ms-catimg { pointer-events: none; display: block; }
 .ms-catimg.sleep { width: 92%; height: auto; }
 .ms-catimg.startled { width: 88%; height: auto; align-self: end; }
+
+/* The lobby picture is a tall stack of cushions, not the shell's wide cat. */
+.lobby-hero { aspect-ratio: 627 / 687; width: min(210px, 56vw); }
+#app.short .lobby-hero { width: min(170px, 46vw); }
+#app.xshort .lobby-hero { width: min(120px, 34vw); }

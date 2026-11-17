@@ -9,6 +9,8 @@ export default {
   "versionName": "1.0.0",
   "privacyUrl": "https://pixelartgames000.github.io/privacy-policy/",
   "contactEmail": "pixelartgames000@gmail.com",
+  "shareText": "Tap, think, don't wake the cat 🐾 Meowsweeper",
+  "shareImage": "img/share.jpg",
   "languages": ["en", "es", "pt", "hi", "de", "fr"],
   "coinPacks": [
     { "id": "coins_500", "coins": 500, "name": "Pocket change" },
