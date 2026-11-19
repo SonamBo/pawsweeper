@@ -879,8 +879,11 @@ export function createManor(host, game) {
     });
   }
 
+  let introDone = null;
   function intro() {
-    return new Promise((resolve) => {
+    return new Promise((res) => {
+      const resolve = () => { introDone = null; res(); };
+      introDone = resolve;
       let i = 0;
       const show = () => {
         const s = INTRO[i];
@@ -962,6 +965,8 @@ export function createManor(host, game) {
     canRestore: () => { const r = selRoom(), c = nextCost(r); return c !== null && balance() >= c; },
     dailySolved: () => state.daily.last === today(),
     isOpen: () => !!overlay,
+    /** Back during the intro skips it (it counts as seen). */
+    skipIntro: () => { if (!introDone) return false; close(); introDone(); return true; },
     close,
     balance,
     sync,

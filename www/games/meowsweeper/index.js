@@ -229,7 +229,8 @@ export default {
       const fitSize = Math.max(18, Math.min(52, Math.floor(Math.min(w / board.cols, h / board.rows))));
       // Cushions under about 40 px are hard to tap: offer a zoomed board you scroll around.
       const zoomable = fitSize < 40;
-      zoomed = zoomable && (zoom ?? fitSize < 28);
+      // Not on a very short window (a landscape browser): a zoomed board there would show a sliver.
+      zoomed = zoomable && (zoom ?? (fitSize < 28 && h >= 260));
       const size = zoomed ? 46 : fitSize;
       elWrap.classList.toggle('zoomed', zoomed);
       elWrap.style.height = zoomed ? `${stage.clientHeight - mh}px` : '';
@@ -1091,7 +1092,7 @@ export default {
         newBoard(saved?.cur);
         manor.refreshLobby();
         if (!saved && !host.flag('intro')) {
-          manor.intro().then(() => { host.setFlag('intro'); if (level === 1 && !host.flag('coached')) setTimeout(() => coach(1), 300); });
+          manor.intro().then(() => { host.setFlag('intro'); if (level === 1 && !host.flag('coached')) setTimeout(() => { if (root.offsetParent) coach(1); }, 300); });
         }
       },
       serialize: () => ({
@@ -1128,6 +1129,7 @@ export default {
         else if (id === 'daily') manor.openDaily();
       },
       onBack() {
+        if (manor.skipIntro()) return false;     // the intro counts as seen; back still leaves the game
         if (manor.isOpen()) { manor.close(); return true; }
         return false;
       },
