@@ -12,6 +12,7 @@ export class LobbyView {
     this.root = root;
     this.handlers = {};
     root.innerHTML = `
+      <div class="lobby-scene" data-scene></div>
       <header class="lobby-top">
         <div class="coins" data-coin-pill>
           ${coinIcon(22)}
@@ -32,8 +33,8 @@ export class LobbyView {
       <div class="lobby-extras" data-extras></div>
       <main class="lobby-main">
         ${logo(222)}
-        ${tagline(190)}
-        ${catHero(252)}
+        <div data-tag style="display:contents">${tagline(190)}</div>
+        <div class="lobby-hero-slot" data-hero>${catHero(252)}</div>
         <button class="play" data-play>
           <span data-play-label>${tr('play')}</span>
           <small data-play-sub></small>
@@ -68,6 +69,15 @@ export class LobbyView {
       const b = e.target.closest('button');
       if (b) this.fire('tab', b.dataset.tab);
     });
+  }
+
+  /** A game's own backdrop (a DOM node), hero (HTML) and tagline (HTML) for the lobby. */
+  setScene(bg, hero, tag) {
+    const scene = this.root.querySelector('[data-scene]');
+    if (bg) scene.replaceChildren(bg); else scene.replaceChildren();
+    if (hero) this.root.querySelector('[data-hero]').innerHTML = hero;
+    if (tag) this.root.querySelector('[data-tag]').innerHTML = tag;
+    this.root.classList.toggle('has-scene', !!bg);
   }
 
   /** The share button, where sharing works (the Android app). */

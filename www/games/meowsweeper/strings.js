@@ -16,39 +16,38 @@ export const LANGS = [
 
 const en = {
   level: 'Level {n}', hard: 'Hard', boss: 'Chapter finale', catsLeft: 'Cats left', language: 'Language',
-  paw: 'Paw', sniff: 'Sniff', scan: 'Whisker Scan', catnip: 'Catnip', free: 'Free',
+  paw: 'Paw', sniff: 'Sniff', scan: 'Whisker Scan', catnip: 'Catnip', hint: 'Hint', free: 'Free',
   tip1: 'Tap a cushion. A number counts the sleeping cats touching it.',
-  tip3: 'Long-press a cushion, or switch on Paw, to mark a sleeping cat.',
+  tip3: 'Think a cat is asleep there? Switch to Mark, or long-press the cushion, to mark it.',
+  tipHint: 'New: Hint! It shows you a cushion that is safe to tap.',
   tip5: 'Tap a number once all its cats are marked to open the rest.',
-  tip6: 'Stuck? Sniff opens a safe cushion for you.',
+  tip6: 'New: Sniff! It opens a safe cushion for you.',
   tip12: 'Hard level: more cats, double coins.',
-  tip15: 'Whisker Scan tells you if a cat hides in a 3×3 area.',
+  tip15: 'New: Whisker Scan tells you if a cat hides in a 3×3 area.',
   tip20: 'Wooden blocks are just furniture. Nothing hides there.',
-  tip40: 'Catnip marks every cat in a 5×5 area.',
+  tip40: 'Chapter 2 gift: Catnip marks every cat in a 5×5 area.',
   tip45: 'Yarn knots need two taps: one to untie, one to open.',
   target: 'Tap a cushion to use {what}', scanYes: 'A cat is hiding in there!', scanNo: 'No cats in there.',
-  woke: 'You woke a cat!', guard: 'Soot hissed: a cat sleeps there!',
-  winHead: 'Purrfect!', winHeadOk: 'Well done!', winKicker: 'All cushions clear', winTitle: 'Level {n} complete',
+  woke: 'You woke a cat!', guard: 'A hiss! A cat sleeps there.',
+  winHead: 'Purrfect!', winHeadOk: 'Great job!', winKicker: 'All cushions clear', winTitle: 'Level {n} complete',
   coins: '+{n} coins', perfect: 'No cats woken: +{n} coins', chest: 'Chapter chest: +{n} coins', next: 'Next level',
   heartKicker: 'Out of hearts', heartTitle: 'One more heart?', heartLine: 'Keep this board for {n} coins.',
   heartOk: 'Buy a heart', heartWhat: 'an extra heart', heartAd: 'Watch an ad · free heart', boosterAd: 'Watch an ad · free use',
-  lostKicker: 'Too noisy', lostTitle: 'Level {n} lost', lostLine: 'The cats are wide awake. Tuck them in and try again.', retry: 'Try again',
+  lostKicker: 'Oh no!', lostTitle: 'Level {n} lost', lostLine: 'The cats are wide awake! Tuck them in and have another go.', retry: 'Try again',
   blurb: 'Uncover every cushion without waking a sleeping cat.',
   tileLevel: 'level', tileStars: 'stars', tilePerfect: 'perfect levels', summary: 'Level {n} · {ch}',
   taskCush: 'Uncover {n} cushions', taskPaws: 'Place {n} paw prints', taskWins: 'Win {n} levels',
   taskChords: 'Open cushions from a number {n} times', taskPerfect: 'Win {n} levels without waking a cat', taskHard: 'Win a Hard level',
-  perkMittens: 'Sniff costs 40 instead of 60.', perkSoot: 'Once a level, stops you from waking a cat.',
+  perkMittens: 'Sniff costs 40 instead of 60.', perkSoot: 'From level 7, once a level, stops you from waking a cat.',
   perkMarmalade: 'Start every level with 4 hearts.', perkPepper: '25% more coins from levels.', perkBiscuit: 'Whisker Scan covers 4×4.',
   fabGingham: 'Gingham', fabKnit: 'Knit', fabVelvet: 'Velvet', fabPatchwork: 'Patchwork', fabStarry: 'Starry night',
   fabNote: 'Cushion fabric',
-  ch: ['Sunny Windowsill', 'Laundry Basket', 'Bookshelf', 'Garden Fence', 'Attic', 'Kitchen Counter', 'Rooftop', 'Fish Market',
-    'Library', 'Greenhouse', 'Train Station', 'Lighthouse', 'Snowy Cabin', 'Night Market', 'Moon Garden', 'Castle Hall',
-    'Sky Balcony', 'Cloud Loft', 'Star Observatory', 'Catnip Palace'],
+  ch: ['Foyer', 'Laundry Room', 'Playroom', 'Rose Garden', 'Box Room', 'Pantry', 'Terrace Balcony', 'Courtyard', 'Grand Library', 'Conservatory', 'Railway Halt', 'Boathouse', 'Ballroom', 'Wine Cellar', 'Moonlit Garden', 'Great Hall', 'Clock Tower', "The Duchess's Suite", 'Observatory', 'The Attic'],
 };
 
 const es = {
   level: 'Nivel {n}', hard: 'Difícil', boss: 'Final del capítulo', catsLeft: 'Gatos restantes', language: 'Idioma',
-  paw: 'Huella', sniff: 'Olfato', scan: 'Radar de bigotes', catnip: 'Hierba gatera', free: 'Gratis',
+  paw: 'Huella', sniff: 'Olfato', scan: 'Radar de bigotes', catnip: 'Hierba gatera', hint: 'Pista', free: 'Gratis',
   tip1: 'Toca un cojín. El número cuenta los gatos dormidos que lo tocan.',
   tip3: 'Mantén pulsado un cojín, o activa Huella, para marcar un gato dormido.',
   tip5: 'Toca un número con todos sus gatos marcados para abrir el resto.',
@@ -73,14 +72,12 @@ const es = {
   perkMarmalade: 'Empieza cada nivel con 4 corazones.', perkPepper: '25% más monedas por nivel.', perkBiscuit: 'El Radar de bigotes cubre 4×4.',
   fabGingham: 'Vichy', fabKnit: 'Punto', fabVelvet: 'Terciopelo', fabPatchwork: 'Retazos', fabStarry: 'Noche estrellada',
   fabNote: 'Tela de los cojines',
-  ch: ['Alféizar soleado', 'Cesto de la ropa', 'Estantería', 'Valla del jardín', 'Desván', 'Encimera', 'Tejado', 'Pescadería',
-    'Biblioteca', 'Invernadero', 'Estación de tren', 'Faro', 'Cabaña nevada', 'Mercado nocturno', 'Jardín lunar', 'Salón del castillo',
-    'Balcón del cielo', 'Ático de nubes', 'Observatorio', 'Palacio gatuno'],
+  ch: ['Vestíbulo', 'Lavadero', 'Cuarto de juegos', 'Rosaleda', 'Trastero', 'Despensa', 'Balcón-terraza', 'Patio', 'Gran biblioteca', 'Invernadero', 'Apeadero', 'Casa de botes', 'Salón de baile', 'Bodega', 'Jardín de luna', 'Gran salón', 'Torre del reloj', 'Aposentos de la duquesa', 'Observatorio', 'El desván'],
 };
 
 const pt = {
   level: 'Nível {n}', hard: 'Difícil', boss: 'Final do capítulo', catsLeft: 'Gatos restantes', language: 'Idioma',
-  paw: 'Patinha', sniff: 'Faro', scan: 'Radar de bigodes', catnip: 'Erva-de-gato', free: 'Grátis',
+  paw: 'Patinha', sniff: 'Faro', scan: 'Radar de bigodes', catnip: 'Erva-de-gato', hint: 'Dica', free: 'Grátis',
   tip1: 'Toque numa almofada. O número conta os gatos dormindo ao redor.',
   tip3: 'Segure uma almofada, ou ative Patinha, para marcar um gato dormindo.',
   tip5: 'Toque num número com todos os gatos marcados para abrir o resto.',
@@ -105,14 +102,12 @@ const pt = {
   perkMarmalade: 'Comece cada nível com 4 corações.', perkPepper: '25% mais moedas por nível.', perkBiscuit: 'O Radar de bigodes cobre 4×4.',
   fabGingham: 'Xadrez', fabKnit: 'Tricô', fabVelvet: 'Veludo', fabPatchwork: 'Retalhos', fabStarry: 'Noite estrelada',
   fabNote: 'Tecido das almofadas',
-  ch: ['Janela ensolarada', 'Cesto de roupa', 'Estante', 'Cerca do jardim', 'Sótão', 'Bancada da cozinha', 'Telhado', 'Peixaria',
-    'Biblioteca', 'Estufa', 'Estação de trem', 'Farol', 'Cabana na neve', 'Feira noturna', 'Jardim da lua', 'Salão do castelo',
-    'Varanda do céu', 'Sótão das nuvens', 'Observatório', 'Palácio dos gatos'],
+  ch: ['Saguão', 'Lavanderia', 'Brinquedoteca', 'Roseiral', 'Quarto de despejo', 'Despensa', 'Varanda', 'Pátio', 'Grande biblioteca', 'Estufa', 'Estação particular', 'Casa de barcos', 'Salão de baile', 'Adega', 'Jardim ao luar', 'Grande salão', 'Torre do relógio', 'Aposentos da duquesa', 'Observatório', 'O sótão'],
 };
 
 const hi = {
   level: 'लेवल {n}', hard: 'कठिन', boss: 'अध्याय का अंत', catsLeft: 'बची बिल्लियाँ', language: 'भाषा',
-  paw: 'पंजा', sniff: 'सूँघो', scan: 'मूँछ स्कैन', catnip: 'कैटनिप', free: 'मुफ़्त',
+  paw: 'पंजा', sniff: 'सूँघो', scan: 'मूँछ स्कैन', catnip: 'कैटनिप', hint: 'संकेत', free: 'मुफ़्त',
   tip1: 'किसी गद्दी पर टैप करें। संख्या बताती है कि आसपास कितनी बिल्लियाँ सो रही हैं।',
   tip3: 'सोती बिल्ली पर निशान लगाने के लिए गद्दी को दबाए रखें, या पंजा चालू करें।',
   tip5: 'जब किसी संख्या की सारी बिल्लियाँ चिह्नित हों, तो बाकी खोलने के लिए उस पर टैप करें।',
@@ -137,14 +132,12 @@ const hi = {
   perkMarmalade: 'हर लेवल 4 दिलों से शुरू करें।', perkPepper: 'लेवल से 25% ज़्यादा सिक्के।', perkBiscuit: 'मूँछ स्कैन 4×4 क्षेत्र देखता है।',
   fabGingham: 'चेक', fabKnit: 'ऊनी', fabVelvet: 'मख़मल', fabPatchwork: 'पैचवर्क', fabStarry: 'तारों भरी रात',
   fabNote: 'गद्दी का कपड़ा',
-  ch: ['धूप वाली खिड़की', 'कपड़ों की टोकरी', 'किताबों की अलमारी', 'बगीचे की बाड़', 'अटारी', 'रसोई का काउंटर', 'छत', 'मछली बाज़ार',
-    'पुस्तकालय', 'ग्रीनहाउस', 'रेलवे स्टेशन', 'लाइटहाउस', 'बर्फ़ीली कुटिया', 'रात का बाज़ार', 'चाँद का बगीचा', 'महल का हॉल',
-    'आसमानी बालकनी', 'बादलों की अटारी', 'तारा वेधशाला', 'कैटनिप महल'],
+  ch: ['प्रवेश कक्ष', 'धुलाई कक्ष', 'खेल कक्ष', 'गुलाब बाग़', 'सामान कक्ष', 'भंडार घर', 'छज्जा', 'आँगन', 'बड़ा पुस्तकालय', 'शीशघर', 'रेलवे पड़ाव', 'नाव घर', 'नृत्य कक्ष', 'तहख़ाना', 'चाँदनी बाग़', 'बड़ा हॉल', 'घंटाघर', 'डचेस का कक्ष', 'वेधशाला', 'अटारी'],
 };
 
 const de = {
   level: 'Level {n}', hard: 'Schwer', boss: 'Kapitelfinale', catsLeft: 'Katzen übrig', language: 'Sprache',
-  paw: 'Pfote', sniff: 'Schnuppern', scan: 'Schnurrhaar-Scan', catnip: 'Katzenminze', free: 'Gratis',
+  paw: 'Pfote', sniff: 'Schnuppern', scan: 'Schnurrhaar-Scan', catnip: 'Katzenminze', hint: 'Tipp', free: 'Gratis',
   tip1: 'Tippe auf ein Kissen. Die Zahl zählt die schlafenden Katzen daneben.',
   tip3: 'Halte ein Kissen gedrückt oder schalte Pfote ein, um eine Katze zu markieren.',
   tip5: 'Tippe auf eine Zahl, deren Katzen alle markiert sind, um den Rest zu öffnen.',
@@ -169,14 +162,12 @@ const de = {
   perkMarmalade: 'Starte jedes Level mit 4 Herzen.', perkPepper: '25 % mehr Münzen pro Level.', perkBiscuit: 'Der Schnurrhaar-Scan deckt 4×4 ab.',
   fabGingham: 'Vichykaro', fabKnit: 'Strick', fabVelvet: 'Samt', fabPatchwork: 'Patchwork', fabStarry: 'Sternennacht',
   fabNote: 'Kissenstoff',
-  ch: ['Sonnige Fensterbank', 'Wäschekorb', 'Bücherregal', 'Gartenzaun', 'Dachboden', 'Küchentheke', 'Hausdach', 'Fischmarkt',
-    'Bibliothek', 'Gewächshaus', 'Bahnhof', 'Leuchtturm', 'Schneehütte', 'Nachtmarkt', 'Mondgarten', 'Schlosssaal',
-    'Himmelsbalkon', 'Wolkenloft', 'Sternwarte', 'Katzenminz-Palast'],
+  ch: ['Eingangshalle', 'Waschküche', 'Spielzimmer', 'Rosengarten', 'Abstellkammer', 'Speisekammer', 'Balkonterrasse', 'Innenhof', 'Große Bibliothek', 'Wintergarten', 'Bahnhaltepunkt', 'Bootshaus', 'Ballsaal', 'Weinkeller', 'Mondgarten', 'Große Halle', 'Uhrturm', 'Gemächer der Herzogin', 'Sternwarte', 'Der Dachboden'],
 };
 
 const fr = {
   level: 'Niveau {n}', hard: 'Difficile', boss: 'Fin du chapitre', catsLeft: 'Chats restants', language: 'Langue',
-  paw: 'Patte', sniff: 'Flair', scan: 'Radar à moustaches', catnip: 'Herbe à chat', free: 'Gratuit',
+  paw: 'Patte', sniff: 'Flair', scan: 'Radar à moustaches', catnip: 'Herbe à chat', hint: 'Indice', free: 'Gratuit',
   tip1: 'Touchez un coussin. Le chiffre compte les chats endormis autour.',
   tip3: 'Appuyez longuement sur un coussin, ou activez Patte, pour marquer un chat endormi.',
   tip5: 'Touchez un chiffre dont tous les chats sont marqués pour ouvrir le reste.',
@@ -201,9 +192,7 @@ const fr = {
   perkMarmalade: 'Commencez chaque niveau avec 4 cœurs.', perkPepper: '25 % de pièces en plus par niveau.', perkBiscuit: 'Le Radar à moustaches couvre 4×4.',
   fabGingham: 'Vichy', fabKnit: 'Tricot', fabVelvet: 'Velours', fabPatchwork: 'Patchwork', fabStarry: 'Nuit étoilée',
   fabNote: 'Tissu des coussins',
-  ch: ['Rebord ensoleillé', 'Panier à linge', 'Bibliothèque du salon', 'Clôture du jardin', 'Grenier', 'Plan de travail', 'Toit', 'Marché aux poissons',
-    'Grande bibliothèque', 'Serre', 'Gare', 'Phare', 'Chalet enneigé', 'Marché de nuit', 'Jardin de lune', 'Salle du château',
-    'Balcon du ciel', 'Loft des nuages', 'Observatoire', 'Palais de l’herbe à chat'],
+  ch: ['Vestibule', 'Buanderie', 'Salle de jeux', 'Roseraie', 'Débarras', 'Garde-manger', 'Terrasse', 'Cour', 'Grande bibliothèque', 'Jardin d’hiver', 'Halte ferroviaire', 'Hangar à bateaux', 'Salle de bal', 'Cave à vin', 'Jardin de lune', 'Grande salle', 'Tour de l’horloge', 'Appartements de la duchesse', 'Observatoire', 'Le grenier'],
 };
 
 const TABLES = { en, es, pt, hi, de, fr };
