@@ -117,7 +117,7 @@ export function generate(spec) {
   const start = Math.max(0, Math.min(rows - 1, sr)) * cols + Math.max(0, Math.min(cols - 1, sc));
   const clear = new Set([start, ...nb[start]]);
 
-  const wall = new Array(n).fill(false);
+  const wall = spec.mask ? spec.mask.map((v, i) => v && !clear.has(i)) : new Array(n).fill(false);
   const cat = new Array(n).fill(false);
   const free = () => { const f = []; for (let i = 0; i < n; i += 1) if (!wall[i] && !cat[i] && !clear.has(i)) f.push(i); return f; };
   for (let k = 0; k < spec.walls; k += 1) { const f = free(); if (f.length) wall[pick(f)] = true; }

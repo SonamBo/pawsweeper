@@ -5,8 +5,8 @@
 export default {
   "name": "Meowsweeper",
   "applicationId": "com.pixelartgames.meowsweeper",
-  "versionCode": 1,
-  "versionName": "1.0.0",
+  "versionCode": 2,
+  "versionName": "3.1.0",
   "privacyUrl": "https://pixelartgames000.github.io/privacy-policy/",
   "contactEmail": "pixelartgames000@gmail.com",
   "shareText": "Tap, think, don't wake the cat 🐾 Meowsweeper",

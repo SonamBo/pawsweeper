@@ -688,6 +688,7 @@ async function boot() {
       shortOf, shortHelps, openCoins, coinsForSale: packsOffered,
       shareFrom: (from) => (social?.canShare ? () => social.share(from) : null),
       lobbyButton: (id, o) => lobby.setExtra(id, o),
+      lobbyScene: (bg, hero, tag) => lobby.setScene(bg, hero, tag),
       shareFile: (o) => social?.shareFile(o) ?? Promise.resolve(false),
       canShareFile: () => !!social?.canShareFile,
     },
@@ -1023,6 +1024,7 @@ async function onSettings() {
   });
   if (!yes) return;
   track('progress_erased', { best_level: shell.stats.bestLevel });
+  restoring = true;          // no last save on the way out: it would write the old progress back
   store.erase();
   location.reload();
 }
@@ -1120,7 +1122,7 @@ function wireDev() {
   const bar = document.getElementById('dev-buttons');
   if (bar) {
     const btns = [...(instance.dev?.buttons || []),
-      { id: 'wipe', label: 'Wipe save', run: () => { store.erase(); location.reload(); } }];
+      { id: 'wipe', label: 'Wipe save', run: () => { restoring = true; store.erase(); location.reload(); } }];
     bar.innerHTML = btns.map((b) => `<button id="${b.id}">${b.label}</button>`).join('');
     btns.forEach((b) => document.getElementById(b.id).addEventListener('click', async () => {
       await b.run();

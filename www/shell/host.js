@@ -102,6 +102,8 @@ export function createHost({ game, shell, wallet, header, ads, onProgress, onSta
      * shows or updates it; null takes it away. A tap opens the game screen and
      * calls the instance's openFromLobby(id) first.
      */
+    /** The lobby's backdrop, hero and tagline, drawn by the game: host.lobbyScene(element, heroHtml, taglineHtml). */
+    lobbyScene: (bg, hero, tag) => events.lobbyScene?.(bg, hero, tag),
     lobbyButton: (id, o) => events.lobbyButton?.(id, o ? { ...o, icon: o.icon ? asset(game.path + o.icon) : '' } : null),
 
     /*
@@ -115,7 +117,7 @@ export function createHost({ game, shell, wallet, header, ads, onProgress, onSta
     canShareFile: () => !!events.canShareFile?.(),
 
     art: {
-      cat: (pose, width, cls = '') => cat(pose, width, cls),
+      cat: (pose, width, cls = '', id) => cat(pose, width, cls, id),
       coin: (width) => coinIcon(width),
       logo: (width) => logo(width),       // the app's title art, for a game's own cards and clips
     },
