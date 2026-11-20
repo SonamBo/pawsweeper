@@ -271,7 +271,6 @@ export function createManor(host, game) {
       <p class="ms-lline" data-lline>${line}</p>
       <div class="ms-lbtns">
         <button class="ms-mbtn ms-icobtn" data-lact="rooms"><span class="ms-ico40">${ROOMS_ICON}</span><span>${UI.rooms}</span></button>
-        <button class="ms-mbtn wide primary" data-lact="play">${fmt(UI.play, { n: lvl() })}</button>
       </div>`;
   }
   function refreshLobby() {
@@ -316,8 +315,10 @@ export function createManor(host, game) {
     host.lobbyScene?.(bg, hero, `<p class="tagline-ribbon">${tg.map(esc).map((w) => `<span>${w}</span>`).join('<i>✦</i>')}</p>`);
     wireLobby();
     setDecor(decor);
+    // While the Decorate button shows, it is the way in: the star icon hides (CSS) and comes back once the room is done.
+    lobbyScreen()?.classList.toggle('ms-hasdeco', c !== null);
     host.lobbyButton('manor', {
-      icon: 'img/star-seal.png', pill: `★ ${balance()}`, news: can, badge: can ? '!' : '',
+      icon: 'img/star-seal.png', pill: `★ ${balance()}`, news: false, badge: '',
       label: `${UI.manor}: ${balance()} ★`,
     });
     const solved = state.daily.last === today();
@@ -520,7 +521,7 @@ export function createManor(host, game) {
       if (e.target === sheet || e.target.closest('[data-x]')) { shut(); return; }
       if (e.target.closest('[data-play]')) {
         shut();
-        if (inLobby) { setDecor(false); where.querySelector('[data-lact="play"]')?.click(); return; }
+        if (inLobby) { setDecor(false); where.querySelector('[data-play]')?.click(); return; }
         close(); game.onPlay(); return;
       }
       const b = e.target.closest('[data-style]');

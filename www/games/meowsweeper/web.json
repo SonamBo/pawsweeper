@@ -1,10 +1,9 @@
 {
   "_about": "How Meowsweeper plays on the web (platforms/crazygames). The Android app ignores it.",
   "keys": [
-    { "key": "f", "click": ".ms-tool[data-tool=\"paw\"]" },
-    { "key": "s", "click": ".ms-tool[data-tool=\"sniff\"]" }
+    { "key": "f", "click": ".ms-tool[data-tool=\"paw\"]" }
   ],
-  "keysHelp": "Left click opens, right click marks a cat. Keys: F paw, S sniff, P pause.",
+  "keysHelp": "Left click opens, right click marks a cat. Keys: F paw, P pause.",
   "css": "web.css",
   "mustBeVisible": [".ms-board", ".ms-tools"],
   "overrides": []

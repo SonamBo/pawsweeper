@@ -13,7 +13,7 @@ import { createManor, roomName, winLine, today, roomPicture, symSrc, keepSrc } f
 import { UI, ROOM_THEMES, SPECIAL_TEXT, CAT_NAMES } from './manor-data.js';
 import { SOUNDS, catPop, flyTo, stamp, wait } from './fx.js';
 
-const PRICE = { hint: 40, sniff: 60, scan: 90, catnip: 150 };
+const PRICE = { hint: 40, scan: 90, catnip: 150 };
 const MAX_EXTRA_HEARTS = 2;
 /** The symbol for each special board. */
 const SYM_OF = { heart: 'heart', teacup: 'teacup', cat: 'catcushion', lantern: 'lantern', catnap: 'catnap' };
@@ -42,7 +42,7 @@ export default {
   analytics: { batch: ['level'] },
 
   perks: {
-    mittens: { text: t('perkMittens'), config: { sniffPrice: 40 } },
+    mittens: { text: t('perkMittens'), config: { hintPrice: 25 } },
     soot: { text: t('perkSoot'), config: { guard: true } },
     marmalade: { text: t('perkMarmalade'), config: { hearts: 4 } },
     pepper: { text: t('perkPepper'), config: { coinBonus: 0.25 } },
@@ -112,7 +112,7 @@ export default {
     let level = 1;
     let stars = {};                     // level -> best stars
     let perfects = 0;
-    let free = { hint: host.remote('free_hints') ?? 3, sniff: 2, scan: 1, catnip: 1 };
+    let free = { hint: host.remote('free_hints') ?? 3, scan: 1, catnip: 1 };
     setSpecialEvery(host.remote('special_every'));
     setEconomy({ base: host.remote('coins_level_base'), per10: host.remote('coins_per_10_levels'), heart1: host.remote('heart_price_x'), heart2: host.remote('heart2_price_x') });
     const PERFECT = () => host.remote('coins_perfect_bonus') ?? 5;
@@ -180,7 +180,6 @@ export default {
     const HEART = `<img class="ms-heart" src="${host.asset('img/heart.png')}" alt="" draggable="false">`;
     const ICON = {
       hint: `<img class="ms-tool-ico" src="${symSrc(host, 'hint')}" alt="" draggable="false">`,
-      sniff: `<img class="ms-tool-ico" src="${host.asset('img/icon-sniff.png')}" alt="" draggable="false">`,
       scan: `<img class="ms-tool-ico" src="${host.asset('img/icon-scan.png')}" alt="" draggable="false">`,
       catnip: `<img class="ms-tool-ico" src="${host.asset('img/icon-catnip.png')}" alt="" draggable="false">`,
     };
@@ -199,8 +198,8 @@ export default {
     const catsLeft = () => board.cats - flag.reduce((s, v) => s + (v ? 1 : 0), 0) - woke.reduce((s, v) => s + (v ? 1 : 0), 0);
     const boost = () => manor?.perkBoost(wornId) || {};
     const maxHearts = () => Math.max(boost().hearts || perk.hearts || 3, spec?.special?.type === 'catnap' ? 5 : 0);
-    const sniffPrice = () => boost().sniffPrice || perk.sniffPrice || PRICE.sniff;
-    const price = (b) => (b === 'sniff' ? sniffPrice() : b === 'scan' ? (boost().scanPrice || PRICE.scan) : PRICE[b]);
+    const hintPrice = () => boost().hintPrice || perk.hintPrice || PRICE.hint;
+    const price = (b) => (b === 'hint' ? hintPrice() : b === 'scan' ? (boost().scanPrice || PRICE.scan) : PRICE[b]);
     const boosterName = (b) => (b === 'hint' ? t('hint') : t(b));
     const totalStars = () => Object.values(stars).reduce((s, v) => s + v, 0);
     const manor = createManor(host, {
@@ -339,7 +338,7 @@ export default {
       if (target) return t('target', { what: boosterName(target) });
       if (mode === 'daily') return `${UI.daily}: ${today()}`;
       if (spec?.special) return SPECIAL_TEXT[spec.special.shape || spec.special.type];
-      const key = { 1: 'tip1', 2: 'tip3', 3: 'tipHint', 5: 'tip5', 7: 'tip6', 10: 'tip15', 12: 'tip12', 21: 'tip20', 26: 'tip40', 45: 'tip45' }[level];
+      const key = { 1: 'tip1', 2: 'tip3', 3: 'tipHint', 5: 'tip5', 10: 'tip15', 12: 'tip12', 21: 'tip20', 26: 'tip40', 45: 'tip45' }[level];
       return key ? t(key) : '';
     }
 
@@ -389,7 +388,7 @@ export default {
       const card = (id, extra, on = false) => (level >= UNLOCK[id]
         ? tool(id, boosterName(id), cost(id), on, extra)
         : `<button class="ms-tool locked ${extra}" data-tool="${id}" data-lock="${UNLOCK[id]}" aria-label="${boosterName(id)}: ${UI.opensAt.replace('{n}', UNLOCK[id])}">${ICON[id] || ''}<span class="ms-tool-name">${boosterName(id)}</span><span class="ms-cost lock">${LOCK} ${UI.lvl.replace('{n}', UNLOCK[id])}</span></button>`);
-      html += card('hint', 'hint') + card('sniff', '') + card('scan', '', target === 'scan') + card('catnip', '', target === 'catnip');
+      html += card('hint', 'hint') + card('scan', '', target === 'scan') + card('catnip', '', target === 'catnip');
       $('[data-tools]').innerHTML = html;
       const modes = $('[data-modes]');
       const hideModes = false;
@@ -894,18 +893,6 @@ export default {
       return how === 'ad' || (how === 'coins' && host.wallet.spend(price(b), `booster_${b}`));
     }
 
-    async function sniff() {
-      const safe = (i) => !open[i] && !board.cat[i] && !board.wall[i];
-      let pool = board.cat.map((_, i) => i).filter((i) => safe(i) && board.nb[i].some((j) => open[j]));
-      if (!pool.length) pool = board.cat.map((_, i) => i).filter(safe);
-      if (!pool.length || !(await pay('sniff'))) return;
-      const i = pool[Math.floor(Math.random() * pool.length)];
-      flag[i] = false; knot[i] = false;
-      host.track('booster_used', { level, booster: 'sniff' });
-      uncover(i);
-      await after();
-    }
-
     function area(i, lo, hi) {
       const c = i % board.cols, r = Math.floor(i / board.cols), out = [];
       for (let dr = lo; dr <= hi; dr += 1) for (let dc = lo; dc <= hi; dc += 1) {
@@ -997,7 +984,6 @@ export default {
       if (over || busy) return;
       if (id === 'paw') { pawMode = !pawMode; target = null; host.sound('tap'); drawHud(); return; }
       if (id === 'hint') { target = null; await hint(); return; }
-      if (id === 'sniff') { target = null; await sniff(); return; }
       target = target === id ? null : id;
       pawMode = false;
       host.sound('tap');

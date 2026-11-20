@@ -273,7 +273,7 @@ export const FRIEND_LINES = {
 /** Level 3 friendship improves the cat's perk. */
 export const FRIEND_PERKS = {
   marmalade: { text: '5 hearts instead of 4', boost: { hearts: 5 } },
-  mittens: { text: 'Sniff costs 25 instead of 40', boost: { sniffPrice: 25 } },
+  mittens: { text: 'Hint costs 15 instead of 25', boost: { hintPrice: 15 } },
   biscuit: { text: 'Whisker Scan costs 60', boost: { scanPrice: 60 } },
   patch: { text: 'Catches one cat a level before it wakes (from level 7)', boost: { guards: 1 } },
   pepper: { text: '40% more coins, not 25%', boost: { coinBonus: 0.4 } },

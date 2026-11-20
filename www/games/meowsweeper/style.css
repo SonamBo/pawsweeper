@@ -1126,3 +1126,7 @@
 .ms-decor .ms-ltray { transform: translateY(0); }
 .ms-decor .ms-sheet { z-index: 30; }
 @media (prefers-reduced-motion: reduce) { .ms-scene-box, .ms-ltray { transition: none; } .ms-lobdeco.ready { animation: none; } }
+/* The Decorate button replaces the lobby's star icon while there is something to place. */
+.ms-hasdeco [data-extra="manor"] { display: none; }
+.ms-lbtns { justify-content: center; }
+.ms-lbtns .ms-icobtn { min-width: 74px; }
