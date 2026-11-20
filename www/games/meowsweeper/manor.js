@@ -298,9 +298,10 @@ export function createManor(host, game) {
     bg.querySelector('.ms-zoomlayer').append(lobbyCanvas);
     lobbyBg = bg;
     const cushion = host.asset(`img/cushion-${game.fabric()}.png`);
-    const deco = c === null ? '' : `
-      <button class="ms-lobdeco ${can ? 'ready' : ''}" data-lact="decorate">
-        <span>${room.cur[pending(r)[0]] < 0 ? UI.decorate : UI.redecorate}</span><span class="ms-cost-star">${stars()}${c}</span>
+    // Always there: the way into decorating (and, through its Rooms button, the manor). A finished room shows 6 / 6.
+    const deco = `
+      <button class="ms-lobdeco ${can ? 'ready' : ''} ${c === null ? 'done' : ''}" data-lact="decorate">
+        <span>${c !== null && room.cur[pending(r)[0]] >= 0 ? UI.redecorate : UI.decorate}</span><span class="ms-cost-star">${c === null ? `✓ ${OBJS}/${OBJS}` : `${stars()}${c}`}</span>
       </button>`;
     const hero = `
       <div class="ms-herowrap">
@@ -315,8 +316,8 @@ export function createManor(host, game) {
     host.lobbyScene?.(bg, hero, `<p class="tagline-ribbon">${tg.map(esc).map((w) => `<span>${w}</span>`).join('<i>✦</i>')}</p>`);
     wireLobby();
     setDecor(decor);
-    // While the Decorate button shows, it is the way in: the star icon hides (CSS) and comes back once the room is done.
-    lobbyScreen()?.classList.toggle('ms-hasdeco', c !== null);
+    // The Decorate button is the way in, so the manor's star icon stays hidden (CSS); the tray's Rooms button still uses it.
+    lobbyScreen()?.classList.add('ms-hasdeco');
     host.lobbyButton('manor', {
       icon: 'img/star-seal.png', pill: `★ ${balance()}`, news: false, badge: '',
       label: `${UI.manor}: ${balance()} ★`,

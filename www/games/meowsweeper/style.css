@@ -1130,3 +1130,4 @@
 .ms-hasdeco [data-extra="manor"] { display: none; }
 .ms-lbtns { justify-content: center; }
 .ms-lbtns .ms-icobtn { min-width: 74px; }
+.ms-lobdeco.done .ms-cost-star { padding: 3px 10px; font-size: 15px; }
