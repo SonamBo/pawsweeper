@@ -25,7 +25,8 @@ Sent with `host.track`. The shell's own events are in `docs/ANALYTICS.md`.
 |---|---|---|
 | `restore_offer` | the "decorate now?" card shows after a win | `room` |
 | `restore_offer_go` | Decorate is tapped on it | `room` |
-| `decorate` | an object is placed in a room | `room`, `obj` (1–6), `style` (`cottage`, `pastel`, `royal`), `round`, `cost` |
+| `lobby_decorate` | Decorate is tapped under the lobby cat (the lobby turns into decorating mode) | `room` |
+| `decorate` | an object is placed in a room | `room`, `obj` (1–6), `style` (`cottage`, `pastel`, `royal`), `round`, `cost`, `where` (`lobby`, `manor`) |
 | `room_complete` | the sixth object of a room is placed | `room`, `round` |
 | `room_open` | the next room opens (10 levels won and six objects placed) | `room`, `chapter` (rooms opened so far), `level` |
 | `keepsake_found` | a keepsake rises from a cushion | `room`, `n` (1 or 2) |

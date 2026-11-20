@@ -330,6 +330,7 @@ Object.assign(UI, {
 });
 
 Object.assign(UI, {
+  tapSpot: 'Tap a + to place something new.', needMore: 'Win levels for more stars:',
   decorate: 'Decorate', add: 'Add', later: 'Later', rooms: 'Rooms', room: 'Room {n}', album: 'Keepsakes',
   redecorate: 'Redecorate', restyle: 'Restyle', free: 'Free', winLevel: 'Win level {n}', lvlShort: 'Lv {n}',
   chooseStyle: 'Choose a style', used: 'Used', playHere: 'Play here', here: 'Here', newRoom: 'New room!', allDone: '6 / 6',
