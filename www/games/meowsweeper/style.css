@@ -1068,3 +1068,204 @@
 .ms-letterrow { background: #fff3dc; border-color: #b58a5a; }
 
 #app.xshort .tagline-ribbon { display: none; }
+
+/* ================================================================ *
+ * 3.2: header that fits and reads on any room; hint proof; Sniff
+ * ================================================================ */
+/* The top row: pause · level and room · stars · coins. Dark warm pills, white numbers. */
+.screen:has(.ms-root) .hdr-top { height: 44px; display: flex; flex-direction: row; align-items: center; gap: 6px; }
+.screen:has(.ms-root) .hdr-top .pause-btn { order: 0; flex: none; width: 42px; height: 42px; }
+.screen:has(.ms-root) .hdr-top .hdr-spacer { order: 1; flex: 1; }
+.screen:has(.ms-root) .hdr-top .ms-starpill { order: 2; margin: 0; }
+.screen:has(.ms-root) .hdr-top .coins { order: 3; }
+.screen:has(.ms-root) .hdr-top .pause-btn,
+.screen:has(.ms-root) .hdr-top .coins,
+.screen:has(.ms-root) .hdr-top .ms-starpill,
+.screen:has(.ms-root) .hdr > .level-title {
+  background: linear-gradient(#7d4a29, #5b3218) !important; color: #fff !important;
+  border: 2px solid #f3cf98 !important; box-shadow: 0 3px 0 #2e1708, 0 5px 12px rgba(30, 12, 2, .35) !important;
+}
+.screen:has(.ms-root) .hdr-top .pause-btn svg { color: #fff; fill: currentColor; }
+.screen:has(.ms-root) .hdr-top .pause-btn * { color: #fff; }
+.screen:has(.ms-root) .hdr-top .coins { height: 42px; gap: 6px !important; padding: 0 5px 0 6px !important; border-radius: 21px; }
+.screen:has(.ms-root) .hdr-top .coins svg, .screen:has(.ms-root) .hdr-top .coins img { width: 28px; height: 28px; }
+.screen:has(.ms-root) .hdr-top .coins-n { color: #fff !important; font: 900 19px/1 var(--font); text-shadow: 0 1px 0 #2e1708; min-width: 2ch; }
+.screen:has(.ms-root) .hdr-top .coins-add { width: 26px !important; height: 26px !important; background: #f7a33b !important; color: #fff; border: 2px solid #fff3dc; font-weight: 900; }
+.screen:has(.ms-root) .hdr-top .ms-starpill { height: 42px; padding: 0 12px 0 4px !important; border-radius: 21px; gap: 3px; }
+.screen:has(.ms-root) .hdr-top .ms-starpill img { width: 32px; height: 32px; }
+.screen:has(.ms-root) .hdr-top .ms-starpill b { color: #fff; font: 900 19px/1 var(--font); text-shadow: 0 1px 0 #2e1708; }
+/* Level title: a pill beside the pause button; the room's name sits inside it, small. */
+.screen:has(.ms-root) .hdr > .level-title {
+  position: absolute; top: 0; left: calc(var(--s4) + 48px); transform: none; margin: 0;
+  max-width: calc(100% - var(--s4) * 2 - 48px - 186px); min-width: 0;
+  height: 42px; padding: 3px 12px 16px !important; border-radius: 14px; text-align: left;
+  font: 900 18px/1.15 var(--font) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0;
+}
+.screen:has(.ms-root) .hdr > .bar-sub {
+  position: absolute; top: 23px; left: calc(var(--s4) + 48px + 12px); transform: none; margin: 0; z-index: 2;
+  max-width: calc(100% - var(--s4) * 2 - 48px - 186px - 24px); text-align: left;
+  font: 800 11px/1.2 var(--font) !important; color: #ffe3b8 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.screen:has(.ms-root) .hdr > .bar-sub[hidden] { display: none; }
+.screen:has(.ms-root) .hdr > .bar-sub[hidden] ~ .level-title, .screen:has(.ms-root) .hdr:has(.bar-sub[hidden]) > .level-title { padding: 0 12px !important; line-height: 38px !important; }
+.screen:has(.ms-root.tall) .hdr > .bar-sub { display: none; }
+.screen:has(.ms-root.tall) .hdr > .level-title { padding: 0 12px !important; line-height: 38px !important; }
+/* A faint dark band behind the header so it reads on the lightest rooms. */
+.screen:has(.ms-root) .hdr::before {
+  content: ""; position: absolute; left: 0; right: 0; top: calc(-1 * env(safe-area-inset-top, 0px) - 10px); height: calc(100% + 40px); z-index: 0; pointer-events: none;
+  background: linear-gradient(rgba(40, 18, 4, .38), rgba(40, 18, 4, .18) 55%, rgba(40, 18, 4, 0));
+}
+.screen:has(.ms-root) .hdr > * { position: relative; z-index: 1; }
+.screen:has(.ms-root) .hdr > .level-title, .screen:has(.ms-root) .hdr > .bar-sub { position: absolute; }
+@media (max-width: 380px) {
+  .screen:has(.ms-root) .hdr-top { gap: 5px; }
+  .screen:has(.ms-root) .hdr-top .pause-btn { width: 38px; height: 38px; }
+  .screen:has(.ms-root) .hdr-top .coins { height: 38px; }
+  .screen:has(.ms-root) .hdr-top .coins svg, .screen:has(.ms-root) .hdr-top .coins img { width: 24px; height: 24px; }
+  .screen:has(.ms-root) .hdr-top .coins-n, .screen:has(.ms-root) .hdr-top .ms-starpill b { font-size: 17px; }
+  .screen:has(.ms-root) .hdr-top .coins-add { width: 23px !important; height: 23px !important; }
+  .screen:has(.ms-root) .hdr-top .ms-starpill { height: 38px; padding: 0 9px 0 3px !important; }
+  .screen:has(.ms-root) .hdr-top .ms-starpill img { width: 27px; height: 27px; }
+  .screen:has(.ms-root) .hdr > .level-title { left: calc(var(--s4) + 43px); height: 38px; font-size: 16px !important; padding: 2px 9px 15px !important;
+    max-width: calc(100% - var(--s4) * 2 - 43px - 166px); }
+  .screen:has(.ms-root) .hdr > .bar-sub { top: 21px; left: calc(var(--s4) + 43px + 9px); font-size: 10px !important; max-width: calc(100% - var(--s4) * 2 - 43px - 166px - 18px); }
+  .screen:has(.ms-root.tall) .hdr > .level-title, .screen:has(.ms-root) .hdr:has(.bar-sub[hidden]) > .level-title { line-height: 34px !important; }
+}
+
+/* Hearts, progress and cats left: solid card, dark bold text. */
+.screen:has(.ms-root) .ms-hud { background: rgba(255, 249, 238, .97) !important; border: 2px solid #c99a6e !important; box-shadow: 0 3px 0 #b07e52, 0 6px 14px rgba(40, 18, 4, .22) !important; }
+.ms-pbar { height: 11px; background: #e2ccae; box-shadow: inset 0 1px 2px rgba(90, 50, 20, .35); }
+.ms-pbar i { background: linear-gradient(#7fd86b, #3fa83d); }
+.ms-ptext { font-size: 12.5px; color: #3e2210; }
+.ms-left b { color: #3e2210; font-weight: 900; }
+
+/* Hint: the number that proves the glowing cushion pulses. */
+.ms-cell.open.proof { animation: ms-proof 1s ease-in-out 4; position: relative; z-index: 2; }
+@keyframes ms-proof { 0%, 100% { transform: scale(1); box-shadow: none; } 50% { transform: scale(1.18); box-shadow: 0 0 0 3px #ffd75e, 0 0 14px 4px rgba(255, 200, 60, .75); border-radius: 8px; } }
+/* Sniff: a paw it placed is certain, so it is golden. */
+.ms-cell.flag.sniffed { box-shadow: inset 0 0 0 3px #f2b632, 0 0 10px rgba(242, 182, 50, .7); }
+.ms-cell.flag.sniffed img { filter: sepia(1) saturate(4) hue-rotate(-12deg) brightness(1.05) drop-shadow(0 1px 0 rgba(90, 50, 0, .6)); }
+.ms-cell.sniffpop { animation: ms-bump .45s ease-out; }
+
+/* Stars line in the room and the style picker: a small star, not a full-size one. */
+.ms-mneed { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 0; font: 900 15px/1.2 var(--font); color: #a3243b; }
+.ms-mneed img { width: 22px !important; height: 22px !important; flex: none; object-fit: contain; }
+.ms-sheetbox .ms-mbtn.wide { min-height: 50px; flex: none; font-size: 17px; }
+.ms-sheetbox .ms-mneed { margin-top: -2px; }
+.ms-mframe.tiny .ms-ghosts { display: none; }
+/* Title and room line sit level with the pause button, wherever the safe area puts it. */
+.screen:has(.ms-root) .hdr > .level-title { top: calc(var(--s4) + var(--safe-top)) !important; }
+.screen:has(.ms-root) .hdr > .bar-sub { top: calc(var(--s4) + var(--safe-top) + 23px) !important; }
+#app.short .screen:has(.ms-root) .hdr > .bar-sub:not([hidden]), #app.xshort .screen:has(.ms-root) .hdr > .bar-sub:not([hidden]) { display: block; }
+#app.short .screen:has(.ms-root.tall) .hdr > .bar-sub, #app.xshort .screen:has(.ms-root.tall) .hdr > .bar-sub { display: none; }
+@media (max-width: 380px) {
+  .screen:has(.ms-root) .hdr > .bar-sub { top: calc(var(--s4) + var(--safe-top) + 20px) !important; }
+}
+
+/* ================================================================ *
+ * 3.2: the shell's tabs (Progress, Cats, Daily, Shop), dressed for the manor.
+ * Styles only; the shell's markup and behaviour are unchanged.
+ * ================================================================ */
+#app:has(.ms-root) .panel-sheet { background: radial-gradient(circle at 50% -10%, #fff3dc, #f6e3c3 45%, #eccfa4); }
+#app:has(.ms-root) .panel-inner h2 { font: 900 30px/1.1 var(--font); color: #5a3214; letter-spacing: -.01em; text-shadow: 0 2px 0 #fff3dc; }
+#app:has(.ms-root) .panel-inner > .panel-sub { color: #7a5638; font-weight: 700; }
+#app:has(.ms-root) .panel-head button { background: #fff7ea; border: 2px solid #c99a6e; box-shadow: 0 3px 0 #d9b48c; }
+#app:has(.ms-root) .cards .card {
+  background: #fffaf1; border: 2.5px solid #e3c49c; border-radius: 18px; box-shadow: 0 4px 0 #e0bf94, 0 8px 16px rgba(90, 50, 20, .08);
+  animation: ms-cardin .38s cubic-bezier(.3, 1.4, .5, 1) both;
+}
+#app:has(.ms-root) .cards .card:nth-child(2) { animation-delay: .04s; } #app:has(.ms-root) .cards .card:nth-child(3) { animation-delay: .08s; }
+#app:has(.ms-root) .cards .card:nth-child(4) { animation-delay: .12s; } #app:has(.ms-root) .cards .card:nth-child(5) { animation-delay: .16s; }
+#app:has(.ms-root) .cards .card:nth-child(6) { animation-delay: .2s; }
+@keyframes ms-cardin { from { transform: translateY(14px) scale(.97); opacity: 0; } }
+#app:has(.ms-root) .cards .card.active { border-color: #f7a33b; background: #fff3dc; box-shadow: 0 0 0 3px rgba(247, 163, 59, .35), 0 4px 0 #e0a24f; }
+#app:has(.ms-root) .tag { font-weight: 900; }
+#app:has(.ms-root) .cat-bar { height: 9px; background: #ecd8bd; }
+#app:has(.ms-root) .cat-bar i { background: linear-gradient(#ffcf6b, #f2a23a); }
+
+/* Progress: the room banner, the manor bar and colourful tiles. */
+#app:has(.ms-root) .panel-inner > .panel-sub:has(.ms-pbanner) { margin: 0 0 14px; }
+.ms-pbanner { position: relative; display: block; height: 168px; border-radius: 22px; overflow: hidden; border: 3px solid #fff7ea;
+  box-shadow: 0 0 0 2.5px #8a5a3b, 0 10px 22px rgba(60, 30, 10, .25); animation: ms-cardin .45s cubic-bezier(.3, 1.4, .5, 1) both; }
+.ms-pb-room { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 70%; }
+.ms-pb-shade { position: absolute; inset: 0; background: linear-gradient(transparent 35%, rgba(40, 18, 4, .72)); }
+.ms-pb-cat { position: absolute; right: 6px; bottom: -6px; }
+.ms-pb-catimg { width: 92px; height: auto; display: block; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35)); animation: ms-bob 2.6s ease-in-out infinite; }
+@keyframes ms-bob { 50% { transform: translateY(-5px) rotate(-2deg); } }
+.ms-pb-text { position: absolute; left: 16px; bottom: 12px; right: 100px; display: flex; flex-direction: column; color: #fff; text-shadow: 0 2px 4px rgba(0, 0, 0, .5); }
+.ms-pb-text small { font: 800 12px/1.2 var(--font); color: #ffe3b8; text-transform: uppercase; letter-spacing: .06em; }
+.ms-pb-text b { font: 900 24px/1.1 var(--font); }
+.ms-pmanor { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 14px; border-radius: 16px;
+  background: #5b3218; color: #fff; box-shadow: 0 3px 0 #2e1708; }
+.ms-pm-l { font: 900 13px/1.1 var(--font); color: #ffe3b8; }
+.ms-pm-bar { height: 12px; border-radius: 6px; background: rgba(255, 255, 255, .2); overflow: hidden; }
+.ms-pm-bar i { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #ffd56b, #f7a33b); animation: ms-grow 1s cubic-bezier(.3, .8, .3, 1) both .2s; transform-origin: left; }
+@keyframes ms-grow { from { transform: scaleX(0); } }
+.ms-pmanor b { font: 900 16px/1 var(--font); }
+#app:has(.ms-root) .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+#app:has(.ms-root) .stat-grid div { position: relative; padding: 12px 12px 10px 14px; border-radius: 18px; border: 0; color: #fff; overflow: hidden;
+  background: var(--tc, #f2a23a); box-shadow: 0 4px 0 rgba(0, 0, 0, .18), inset 0 2px 0 rgba(255, 255, 255, .35);
+  animation: ms-cardin .4s cubic-bezier(.3, 1.4, .5, 1) both; }
+#app:has(.ms-root) .stat-grid div::after { content: ""; position: absolute; right: -18px; top: -18px; width: 70px; height: 70px; border-radius: 50%; background: rgba(255, 255, 255, .14); }
+#app:has(.ms-root) .stat-grid b { display: flex; align-items: center; gap: 6px; font: 900 26px/1.1 var(--font); color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .18); }
+#app:has(.ms-root) .stat-grid b small { font-size: 14px; opacity: .8; margin-left: 1px; }
+#app:has(.ms-root) .stat-grid span { font: 800 12.5px/1.2 var(--font); color: rgba(255, 255, 255, .92); }
+.ms-tic { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .25)); flex: none; }
+/* The shell's own tiles (coins earned, best level, cats, days) get icons too; best level repeats "level", so it goes. */
+#app:has(.ms-root) .stat-grid div:nth-child(1) b::before, #app:has(.ms-root) .stat-grid div:nth-child(4) b::before {
+  content: ""; width: 28px; height: 28px; flex: none; background: center / contain no-repeat; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .25)); }
+#app:has(.ms-root) .stat-grid div:nth-child(1) b::before { background-image: url("../../img/coin.png"); }
+#app:has(.ms-root) .stat-grid div:nth-child(4) b::before { background-image: url("img/icon-daily.png"); }
+#app:has(.ms-root) .stat-grid div:nth-child(2), #app:has(.ms-root) .stat-grid div:nth-child(3) { display: none; }
+#app:has(.ms-root) .stat-grid div:nth-child(1) { --tc: linear-gradient(135deg, #f4b13d, #e08a1e); }
+#app:has(.ms-root) .stat-grid div:nth-child(4) { --tc: linear-gradient(135deg, #5fb6e0, #3a87c0); }
+#app:has(.ms-root) .stat-grid div:nth-child(5) { --tc: linear-gradient(135deg, #f08a6c, #d4573f); }
+#app:has(.ms-root) .stat-grid div:nth-child(6) { --tc: linear-gradient(135deg, #f6c64b, #e7a020); }
+#app:has(.ms-root) .stat-grid div:nth-child(7) { --tc: linear-gradient(135deg, #8bc96a, #4f9a3a); }
+#app:has(.ms-root) .stat-grid div:nth-child(8) { --tc: linear-gradient(135deg, #b58ad8, #8456b4); }
+#app:has(.ms-root) .stat-grid div:nth-child(9) { --tc: linear-gradient(135deg, #e889b0, #c9557f); }
+#app:has(.ms-root) .stat-grid div:nth-child(10) { --tc: linear-gradient(135deg, #f7a35b, #d9702a); }
+#app:has(.ms-root) .stat-grid div:nth-child(11) { --tc: linear-gradient(135deg, #f28b9a, #d24c63); }
+#app:has(.ms-root) .stat-grid div:nth-child(12) { --tc: linear-gradient(135deg, #6fc7b5, #3a9a86); }
+#app:has(.ms-root) .stat-grid div:nth-child(13) { --tc: linear-gradient(135deg, #f4b13d, #c97a12); }
+#app:has(.ms-root) .stat-grid div:nth-child(n+4) { animation-delay: calc(var(--i, 0) * 1ms + .05s); }
+
+/* Cats: big sticker faces, perk and friendship hearts. */
+#app:has(.ms-root) .cards .card .card-art { width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #fff, #f6dfba); box-shadow: inset 0 0 0 2.5px #e3c49c; display: grid; place-items: center; }
+#app:has(.ms-root) .cards .card .card-art .cat-avatar { width: 56px !important; height: auto; }
+#app:has(.ms-root) .card-main b { font: 900 18px/1.15 var(--font); color: #3e2210; }
+#app:has(.ms-root) .cat-perk { font: 700 13px/1.3 var(--font); color: #6b4a35; display: flex; flex-direction: column; gap: 3px; }
+.ms-fhearts { display: flex; gap: 2px; margin-top: 2px; }
+.ms-fhearts img { width: 16px; height: auto; filter: grayscale(1) opacity(.3); }
+.ms-fhearts img.on { filter: none; }
+.ms-fline { font: 400 15px/1.25 "Storybook", cursive; color: #8a4a1a; font-style: normal; }
+#app:has(.ms-root) .cards .card.locked { background: #f1e4d2; border-style: dashed; box-shadow: none; }
+#app:has(.ms-root) .cards .card.locked .card-art { filter: grayscale(1) brightness(.35) opacity(.6); }
+
+/* Daily: chunky task cards, a gift for all three, paw-print streak. */
+#app:has(.ms-root) .task-tier { font-weight: 900; border-radius: 10px; box-shadow: 0 2px 0 rgba(0, 0, 0, .15); }
+#app:has(.ms-root) .card.task.done { border-color: #5fae4b; background: #f3faec; }
+#app:has(.ms-root) .card.task.bonus { background: linear-gradient(135deg, #fff3dc, #ffe4b5); border-color: #f2b632; }
+#app:has(.ms-root) .claim { background: linear-gradient(#ffcf6b, #f2a23a); color: #3e2210; font-weight: 900; border-radius: 14px; box-shadow: 0 3px 0 #b86f12; animation: ms-dotpulse 1.4s ease-in-out infinite; }
+#app:has(.ms-root) .streak { gap: 6px; }
+#app:has(.ms-root) .stamp { border: 2.5px dashed #d8b98f; background: #fff7ea; }
+#app:has(.ms-root) .stamp.on { border: 2.5px solid #f2a23a; background: radial-gradient(circle, #fff3dc, #ffd99a); box-shadow: 0 3px 0 #e0a24f; }
+
+/* Shop: fabrics as big cushion swatches, coin packs that pop. */
+#app:has(.ms-root) .cards:not(.packs) .card .card-art .art { width: 56px !important; height: 56px; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(90, 50, 20, .25)); }
+#app:has(.ms-root) .cards.packs .card { background: linear-gradient(135deg, #fffaf1, #fff0d4); border-color: #f2c26d; }
+#app:has(.ms-root) .cards.packs .card.tagged { border-color: #f7a33b; box-shadow: 0 0 0 3px rgba(247, 163, 59, .3), 0 4px 0 #e0a24f; }
+#app:has(.ms-root) .pack-tag { background: #c9372f; color: #fff; font-weight: 900; }
+#app:has(.ms-root) .buy { background: linear-gradient(#5fbf4f, #3f8f34); box-shadow: 0 3px 0 #2c6524; font-weight: 900; border-radius: 14px; min-width: 76px; }
+#app:has(.ms-root) .pack-bonus { color: #c9372f; font-weight: 900; font-style: normal; }
+
+/* The game's own Puzzle of the Day and Cats screens. */
+.ms-daily .ms-cal { gap: 6px; }
+.ms-daily .ms-day { border-radius: 14px; background: #fff7ea; border: 2.5px dashed #d8b98f; }
+.ms-daily .ms-day.done { border: 2.5px solid #f2a23a; background: radial-gradient(circle, #fff3dc, #ffd99a); }
+.ms-daily .ms-day.today { box-shadow: 0 0 0 3px rgba(247, 163, 59, .45); }
+.ms-daily .ms-drow, .ms-cats .ms-crow { background: #fffaf1; border: 2.5px solid #e3c49c; border-radius: 18px; box-shadow: 0 4px 0 #e0bf94; }
+.ms-daily .ms-best li { border-radius: 12px; background: #fff3dc; }
+.ms-cats .ms-cface { width: 64px; height: auto; }
+#app:has(.ms-root) .panel-inner > .panel-sub:has(.ms-pbanner) { display: block; width: 100%; max-width: none; }
+.ms-pmanor { width: 100%; box-sizing: border-box; }
