@@ -246,6 +246,7 @@ export const UI = {
   replayOf: 'Replay · level {n}', replayDone: 'Back to level {n}',
   heartTitle1: 'Out of hearts!', heartBuy: 'Get coins', heartUse: 'Use {n} coins', heartAd: 'Watch an ad', heartGive: 'Give up',
   heartLine1: 'Keep going with 1 extra heart.', heartLine2: 'Last chance: one more heart for this level.', heartNeed: 'You need {n} more coins.',
+  tapSpot: 'Tap a + to place something new.', needMore: 'Win levels for more stars:',
   decorate: 'Decorate', later: 'Later', rooms: 'Rooms', room: 'Room {n}', album: 'Keepsakes',
   redecorate: 'Redecorate', restyle: 'Restyle', free: 'Free', used: 'Used', here: 'Here', newRoom: 'New room!', allDone: '6 / 6',
   letterTitle: 'The Duchess’s letter',

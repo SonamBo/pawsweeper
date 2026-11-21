@@ -82,6 +82,7 @@ says so. A game with no `cosmetics` shows an empty Shop section.
 | `show()` / `hide()` | no | the game screen became visible or hidden |
 | `pause()` / `resume()` | no | app backgrounded, or a card is covering the game |
 | `onBack()` | no | return `true` if the game handled the back press |
+| `onLobbyBack()` | no | Android back while the lobby shows: return `true` if the game handled it (left a mode it drew there) |
 | `restart()` | no | if present, the pause menu offers Restart |
 | `setPerk(config)` | no | the worn cat changed |
 | `setCosmetic(id)` | no | a cosmetic was bought or worn |

@@ -1096,6 +1096,7 @@ function installBridge() {
         showScreen('lobby');
         return true;
       }
+      if (screen === 'lobby' && instance?.onLobbyBack?.()) return true;   // e.g. leave a mode the game drew in the lobby
       return false;
     },
     flush: save,

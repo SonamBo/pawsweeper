@@ -243,30 +243,83 @@ export function createManor(host, game) {
 
   /* ---- the lobby ---- */
 
-  let lobbyCanvas = null;
+  /*
+   * The lobby is the room itself. Normally the cat sleeps in front of it; the
+   * Decorate button turns the lobby into decorating mode: the picture shows
+   * whole, a + marks each empty spot, and objects arrive right there.
+   */
+  let lobbyCanvas = null, lobbyBg = null, decor = false, lobbyWired = false;
+  const lobbyScreen = () => lobbyBg?.closest('.screen') || null;
+  function setDecor(on) {
+    decor = !!on;
+    lobbyScreen()?.classList.toggle('ms-decor', decor);
+  }
+  function lobbyTray(r) {
+    const c = nextCost(r), n = addedCount(r);
+    const can = c !== null && balance() >= c;
+    const left = ROOM_LEVELS - Math.min(ROOM_LEVELS, levelsHere());
+    const line = c === null
+      ? (r === newestRoom() && left > 0 ? fmt(UI.moreLevels, { n: left }) : '')
+      : can ? UI.tapSpot : `${UI.needMore} ${stars()} ${balance()} / ${c}`;
+    return `
+      <div class="ms-ltop">
+        <button class="ms-mbtn" data-lact="done" aria-label="${UI.back}">‹</button>
+        <div class="ms-mtitle"><b>${esc(roomName(r))}</b><small>${roomSub(r)} · ${n} / ${OBJS}</small></div>
+        ${starPill()}
+      </div>
+      <div class="ms-strip">${[...Array(OBJS).keys()].map((o) => chipHtml(r, o)).join('')}</div>
+      <p class="ms-lline" data-lline>${line}</p>
+      <div class="ms-lbtns">
+        <button class="ms-mbtn ms-icobtn" data-lact="rooms"><span class="ms-ico40">${ROOMS_ICON}</span><span>${UI.rooms}</span></button>
+      </div>`;
+  }
   function refreshLobby() {
     sync();
     const r = selRoom();
-    if (!lobbyCanvas) { lobbyCanvas = document.createElement('canvas'); lobbyCanvas.className = 'ms-scene-room'; }
-    drawScene(host, lobbyCanvas, r, R(r).cur);
+    const room = R(r);
+    if (!lobbyCanvas) { lobbyCanvas = document.createElement('canvas'); lobbyCanvas.className = 'ms-mcanvas ms-scene-room'; }
+    drawScene(host, lobbyCanvas, r, room.cur);
+    const c = nextCost(r);
+    const can = c !== null && balance() >= c;
+    const ghosts = pending(r).map((o) => {
+      const b = boxOf(r, o, Math.max(0, room.cur[o]));
+      return `<button class="ms-ghost ${can ? 'can' : ''} ${room.cur[o] >= 0 ? 'swap' : ''}" data-obj="${o}" style="left:${(b.x * 100).toFixed(1)}%;top:${((b.t + b.h * 0.55) * 100).toFixed(1)}%" aria-label="${esc(DECO_NAMES[r - 1][o])}">${room.cur[o] >= 0 ? '↻' : '+'}</button>`;
+    }).join('');
     const bg = document.createElement('div');
     bg.className = 'ms-scene';
-    bg.append(lobbyCanvas);
-    const shade = document.createElement('div'); shade.className = 'ms-scene-shade'; bg.append(shade);
+    bg.innerHTML = `
+      <div class="ms-scene-box" data-frame>
+        <div class="ms-zoomlayer"></div>
+        <div class="ms-ghosts">${ghosts}</div>
+        <span class="ms-mcat" data-mcat aria-hidden="true">${host.art.cat('cheer', 96, 'ms-mcat-img', hostOf(r))}</span>
+      </div>
+      <div class="ms-scene-shade"></div>
+      <div class="ms-ltray" data-ltray>${lobbyTray(r)}</div>`;
+    bg.querySelector('.ms-zoomlayer').append(lobbyCanvas);
+    lobbyBg = bg;
     const cushion = host.asset(`img/cushion-${game.fabric()}.png`);
+    // Always there: the way into decorating (and, through its Rooms button, the manor). A finished room shows 6 / 6.
+    const deco = `
+      <button class="ms-lobdeco ${can ? 'ready' : ''} ${c === null ? 'done' : ''}" data-lact="decorate">
+        <span>${c !== null && room.cur[pending(r)[0]] >= 0 ? UI.redecorate : UI.decorate}</span><span class="ms-cost-star">${c === null ? `✓ ${OBJS}/${OBJS}` : `${stars()}${c}`}</span>
+      </button>`;
     const hero = `
-      <div class="ms-hero" data-hero-cat>
-        <span class="ms-hero-shadow"></span>
-        <img class="ms-hero-cu c1" src="${cushion}" alt="" draggable="false">
-        <span class="ms-hero-cat">${host.art.cat('sleep', 210, 'ms-hero-img')}</span>
-        <span class="ms-zzz" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>
+      <div class="ms-herowrap">
+        <div class="ms-hero" data-hero-cat>
+          <span class="ms-hero-shadow"></span>
+          <img class="ms-hero-cu c1" src="${cushion}" alt="" draggable="false">
+          <span class="ms-hero-cat">${host.art.cat('sleep', 210, 'ms-hero-img')}</span>
+          <span class="ms-zzz" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>
+        </div>${deco}
       </div>`;
     const tg = TAGLINE[getLang()] || TAGLINE.en;
     host.lobbyScene?.(bg, hero, `<p class="tagline-ribbon">${tg.map(esc).map((w) => `<span>${w}</span>`).join('<i>✦</i>')}</p>`);
-    const c = nextCost(r);
-    const can = c !== null && balance() >= c;
+    wireLobby();
+    setDecor(decor);
+    // The Decorate button is the way in, so the manor's star icon stays hidden (CSS); the tray's Rooms button still uses it.
+    lobbyScreen()?.classList.add('ms-hasdeco');
     host.lobbyButton('manor', {
-      icon: 'img/star-seal.png', pill: `★ ${balance()}`, news: can, badge: can ? '!' : '',
+      icon: 'img/star-seal.png', pill: `★ ${balance()}`, news: false, badge: '',
       label: `${UI.manor}: ${balance()} ★`,
     });
     const solved = state.daily.last === today();
@@ -274,6 +327,34 @@ export function createManor(host, game) {
     const u = unread();
     host.lobbyButton('diary', { icon: 'img/icon-diary.png', pill: UI.album, badge: u ? String(u) : '', news: u > 0, label: UI.album });
     game.onStars?.();
+  }
+
+  /** One listener on the lobby screen for the Decorate button, the spots, the chips and the tray. */
+  function wireLobby() {
+    const scr = lobbyScreen();
+    if (!scr || lobbyWired) return;
+    lobbyWired = true;
+    scr.addEventListener('click', (e) => {
+      if (busy) return;
+      const b = e.target.closest('[data-lact],[data-obj]');
+      if (!b || b.disabled || !scr.contains(b) || b.closest('.ms-sheet')) return;
+      const r = selRoom();
+      if (b.dataset.obj !== undefined) {
+        if (!b.closest('.ms-scene')) return;
+        if (!decor) { setDecor(true); host.sound('open'); }
+        openPicker(r, Number(b.dataset.obj), scr);
+        return;
+      }
+      const act = b.dataset.lact;
+      if (act === 'decorate') {
+        host.sound('open'); setDecor(true);
+        host.track('lobby_decorate', { room: r });
+        const p = pending(r), c = nextCost(r);
+        if (p.length && c !== null && balance() >= c) setTimeout(() => openPicker(r, p[0], scr), 380);
+      } else if (act === 'done') { host.sound('tap'); setDecor(false); }
+      else if (act === 'play') { setDecor(false); scr.querySelector('[data-play]')?.click(); }
+      else if (act === 'rooms') { setDecor(false); scr.querySelector('[data-extra="manor"]')?.click(); }
+    });
   }
 
   /* ---- overlays ---- */
@@ -410,9 +491,10 @@ export function createManor(host, game) {
   }
 
   /** The style picker for object o: three versions side by side; a tap places it. */
-  function openPicker(r, o) {
+  function openPicker(r, o, where = overlay) {
     const room = R(r);
-    if (room.added[o] && !freeRestyle(r)) { host.sound('tap'); bounceChip(o); return; }
+    const inLobby = where !== overlay;
+    if (room.added[o] && !freeRestyle(r)) { host.sound('tap'); bounceChip(o, where); return; }
     const free = freeRestyle(r) && room.cur[o] >= 0;
     const c = free ? 0 : nextCost(r);
     if (c === null) return;
@@ -434,39 +516,85 @@ export function createManor(host, game) {
         }).join('')}</div>
         ${can ? '' : `<p class="ms-mneed">${stars()} ${balance()} / ${c}</p><button class="ms-mbtn wide primary" data-play>${fmt(UI.play, { n: lvl() })}</button>`}
       </div>`;
-    overlay.appendChild(sheet);
+    where.appendChild(sheet);
     host.sound('open');
     requestAnimationFrame(() => sheet.classList.add('in'));
     const shut = () => { sheet.classList.remove('in'); setTimeout(() => sheet.remove(), 220); };
     sheet.addEventListener('click', async (e) => {
       if (e.target === sheet || e.target.closest('[data-x]')) { shut(); return; }
-      if (e.target.closest('[data-play]')) { shut(); close(); game.onPlay(); return; }
+      if (e.target.closest('[data-play]')) {
+        shut();
+        if (inLobby) { setDecor(false); where.querySelector('[data-play]')?.click(); return; }
+        close(); game.onPlay(); return;
+      }
       const b = e.target.closest('[data-style]');
       if (!b || b.disabled) return;
       shut();
-      await place(r, o, Number(b.dataset.style), c);
+      if (inLobby) await placeInLobby(r, o, Number(b.dataset.style), c);
+      else await place(r, o, Number(b.dataset.style), c);
     });
   }
 
-  function bounceChip(o) {
-    const chip = overlay?.querySelector(`.ms-chip[data-obj="${o}"]`);
+  function bounceChip(o, where = overlay) {
+    const chip = where?.querySelector(`.ms-chip[data-obj="${o}"]`);
     chip?.classList.remove('nudge'); void chip?.offsetWidth; chip?.classList.add('nudge');
   }
 
   /** Pay, then the object arrives in the room with its own moment, and the host cat reacts. */
-  async function place(r, o, s, c) {
+  function pay(r, o, s, c, where) {
     const room = R(r);
-    if (balance() < c || busy) return;
-    busy = true;
     const prev = room.cur[o];
     state.spent += c;
     room.cur[o] = s;
     if (!room.used[o].includes(s)) room.used[o].push(s);
     room.added[o] = 1;
     const up = befriend(hostOf(r), 2);
-    host.track('decorate', { room: r, obj: o + 1, style: STYLES[s].id, round: room.round, cost: c });
+    host.track('decorate', { room: r, obj: o + 1, style: STYLES[s].id, round: room.round, cost: c, where });
     game.save();
     game.onStars?.();
+    return { prev, up };
+  }
+
+  /** The same moment in the lobby: the object arrives in the room behind the cat. */
+  async function placeInLobby(r, o, s, c) {
+    if (balance() < c || busy || !lobbyBg) return;
+    busy = true;
+    const { prev, up } = pay(r, o, s, c, 'lobby');
+    const el = lobbyBg;
+    el.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+    const pill = el.querySelector('[data-starpill] b'); if (pill) pill.textContent = balance();
+    try { await arrive(el, r, o, s, prev); } catch { /* the lobby was redrawn meanwhile */ }
+    game.onRoomChanged?.();
+    const doneAll = addedCount(r) >= OBJS;
+    refreshLobby();
+    busy = false;
+    const line = () => lobbyBg?.querySelector('[data-lline]');
+    if (up && line()) line().textContent = up;
+    if (!doneAll) return;
+    busy = true;
+    const frame = lobbyBg.querySelector('[data-frame]');
+    host.sound('fanfare'); host.haptic?.([0, 30, 40, 30]);
+    sparkles(frame, 26);
+    host.track('room_complete', { room: r, round: R(r).round });
+    await stamp(frame, symSrc(host, 'trophy'), UI.allDone);
+    busy = false;
+    if (r === newestRoom() && canAdvance()) {
+      advance();
+      state.sel = 0;
+      game.onRoomChanged?.();
+      refreshLobby();
+      const fr = lobbyBg.querySelector('[data-frame]');
+      host.sound('door');
+      await doors(fr);
+      sparkles(fr, 16); host.sound('fanfare');
+      await stamp(fr, symSrc(host, 'pawkey'), UI.newRoom);
+    }
+  }
+
+  async function place(r, o, s, c) {
+    if (balance() < c || busy) return;
+    busy = true;
+    const { prev, up } = pay(r, o, s, c, 'manor');
     const el = overlay;
     el.querySelectorAll('button').forEach((b) => { b.disabled = true; });
     const pill = el.querySelector('[data-starpill] b'); if (pill) pill.textContent = balance();
@@ -941,6 +1069,11 @@ export function createManor(host, game) {
   }
 
   return {
+    /** Android back in the lobby: leave decorating first. */
+    lobbyBack() {
+      const sh = lobbyScreen()?.querySelector('.ms-sheet.in [data-x]');
+      if (sh) { sh.click(); return true; }
+      if (!decor) return false; setDecor(false); host.sound('tap'); return true; },
     load(saved) {
       const f = fresh();
       const L = lvl();

@@ -1230,6 +1230,7 @@ export default {
         if (manor.isOpen()) { manor.close(); return true; }
         return false;
       },
+      onLobbyBack: () => manor.lobbyBack(),
       canOffer: (task) => !task.from || level >= task.from,
       rewardValue: () => heartPrice(level),
       dailyCard: () => manor.dailyCard(),
