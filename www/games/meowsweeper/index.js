@@ -9,7 +9,7 @@
 import { levelSpec, dailySpec, setSpecialEvery, setEconomy, levelReward, baseReward, heartPrice, UNLOCK, CHAPTER_SIZE } from './levels.js';
 import { generate } from './generator.js';
 import { t, LANGS, getLang, setLang } from './strings.js';
-import { createManor, roomName, winLine, today, roomPicture, symSrc, keepSrc } from './manor.js';
+import { createManor, roomName, hostOf, winLine, today, roomPicture, symSrc, keepSrc } from './manor.js';
 import { UI, ROOM_THEMES, SPECIAL_TEXT, CAT_NAMES } from './manor-data.js';
 import { SOUNDS, catPop, flyTo, stamp, wait } from './fx.js';
 
@@ -27,6 +27,15 @@ const bits = (arr) => arr.map((v) => (v ? '1' : '0')).join('');
 const unbits = (s, n) => Array.from({ length: n }, (_, i) => s?.[i] === '1');
 
 // Task wording, worked out here so the manifest below stays plain (the pre-flight reads it as text).
+/** The running game, for the Cats and Progress tabs. */
+let live = null;
+const withFriend = (id, text) => {
+  const f = live?.manor.friendOf(id);
+  if (!f) return text;
+  const hearts = [1, 2, 3, 4, 5].map((i) => `<img class="${i <= f.level ? 'on' : ''}" src="${live.host.asset('img/friendship-heart.png')}" alt="">`).join('');
+  return `${text}<span class="ms-fhearts" aria-label="${f.level} / 5">${hearts}</span>${f.line ? `<i class="ms-fline">“${f.line}”</i>` : ''}`;
+};
+
 const TASK = {
   taskCush150: t('taskCush', { n: 150 }), taskPaws15: t('taskPaws', { n: 15 }),
   taskWins2: t('taskWins', { n: 2 }), taskWins5: t('taskWins', { n: 5 }), taskWins10: t('taskWins', { n: 10 }),
@@ -41,12 +50,17 @@ export default {
   styles: ['style.css'],
   analytics: { batch: ['level'] },
 
+  // The Cats tab: the five cats of the story, each shown by name before it is won (Soot has no art).
+  catRoster: { hide: ['soot'], showLocked: true },
+
+  // Each cat's perk; the Cats tab shows it with the cat's friendship from the manor.
   perks: {
-    mittens: { text: t('perkMittens'), config: { sniffPrice: 40 } },
+    patch: { get text() { return withFriend('patch', t('perkPatch')); }, config: {} },
+    mittens: { get text() { return withFriend('mittens', t('perkMittens')); }, config: { sniffPrice: 40 } },
     soot: { text: t('perkSoot'), config: { guard: true } },
-    marmalade: { text: t('perkMarmalade'), config: { hearts: 4 } },
-    pepper: { text: t('perkPepper'), config: { coinBonus: 0.25 } },
-    biscuit: { text: t('perkBiscuit'), config: { scanWide: true } },
+    marmalade: { get text() { return withFriend('marmalade', t('perkMarmalade')); }, config: { hearts: 4 } },
+    pepper: { get text() { return withFriend('pepper', t('perkPepper')); }, config: { coinBonus: 0.25 } },
+    biscuit: { get text() { return withFriend('biscuit', t('perkBiscuit')); }, config: { scanWide: true } },
   },
 
   cosmetics: [
@@ -132,9 +146,12 @@ export default {
     let scanMarks = null;
     let langOpen = false;
     let hintCell = -1;                  // a cushion the Hint showed as safe
+    let proofCell = -1;                 // the number that proves it
+    let sniffed = new Set();            // cats Sniff found (their paws are certain)
     let zoom = null;                    // null: automatic; true/false: the player's choice
     let zoomed = false;
     let roomShown = '';
+    let lastRoomUrl = '';
     let mode = 'level';                 // 'level' or 'daily'
     let levelCur = null;                // the level board in progress while the daily puzzle is open
     let dailyStart = 0;
@@ -219,6 +236,7 @@ export default {
       dailyCoins: () => host.remote('daily_coins') ?? 60,
       onStars: () => { shownStars = manor.balance(); drawStarPill(); },
     });
+    live = { manor, host };
 
     function fit() {
       if (!board) return;
@@ -272,6 +290,7 @@ export default {
       scr.style.backgroundPosition = 'center';
       // The room exactly as the player has decorated it so far.
       roomPicture(host, n, look).then((url) => {
+        lastRoomUrl = url;
         if (roomShown !== key) return;
         scr.style.backgroundImage = `linear-gradient(rgba(255, 244, 228, .12), rgba(255, 244, 228, .12)), url("${url}")`;
       });
@@ -295,6 +314,7 @@ export default {
         starPill.addEventListener('click', () => {
           if (busy || over || manor.isOpen()) return;
           host.sound('tap');
+          if (coachStep === 4) host.setFlag('coachStars');
           if (coachStep >= 3) { host.coach?.clear(); coachStep = 0; }
           ambience(false);
           manor.openManor();
@@ -316,10 +336,10 @@ export default {
       let cls = 'ms-cell', html = '';
       if (board.wall[i]) cls += ' wall';
       else if (woke[i]) { cls += ' woke'; html = WOKE_IMG; }
-      else if (open[i]) { cls += ' open'; if (board.num[i] > 0) { cls += ` n${board.num[i]}`; html = String(board.num[i]); } }
+      else if (open[i]) { cls += ' open'; if (board.num[i] > 0) { cls += ` n${board.num[i]}`; html = String(board.num[i]); } if (i === proofCell) cls += ' proof'; }
       else {
         cls += ' cover';
-        if (flag[i]) { cls += ' flag'; html = PAW_IMG; }
+        if (flag[i]) { cls += sniffed.has(i) ? ' flag sniffed' : ' flag'; html = PAW_IMG; }
         else if (knot[i]) { cls += ' knot'; html = YARN_IMG; }
         else if (over && board.cat[i]) { cls += ' reveal'; html = SLEEP_IMG; }
         if (i === hintCell) cls += ' hint';
@@ -337,10 +357,12 @@ export default {
     function tipText() {
       if (note) return note;
       if (target) return t('target', { what: boosterName(target) });
-      if (mode === 'daily') return `${UI.daily}: ${today()}`;
+      if (mode === 'daily') return UI.dailyTip;
       if (spec?.special) return SPECIAL_TEXT[spec.special.shape || spec.special.type];
       const key = { 1: 'tip1', 2: 'tip3', 3: 'tipHint', 5: 'tip5', 7: 'tip6', 10: 'tip15', 12: 'tip12', 21: 'tip20', 26: 'tip40', 45: 'tip45' }[level];
-      return key ? t(key) : '';
+      if (key) return t(key);
+      const left = mode === 'level' ? manor.objectsToOpen() : 0;
+      return left ? UI.placeRest.replace('{n}', left) : '';
     }
 
     function drawHud() {
@@ -349,15 +371,15 @@ export default {
       const badge = $('[data-badge]');
       const fin = isFin();
       badge.hidden = !spec.hard && !spec.special && !fin && mode !== 'daily';
-      const bsym = mode === 'daily' ? '' : fin ? 'trophy' : spec.special ? SYM_OF[spec.special.shape || spec.special.type] : '';
-      const btext = mode === 'daily' ? UI.daily : fin ? UI.finale : spec.hard ? t('hard') : UI.special;
+      const bsym = mode === 'daily' ? 'img/icon-daily.png' : fin ? 'trophy' : spec.special ? SYM_OF[spec.special.shape || spec.special.type] : '';
+      const btext = mode === 'daily' ? UI.dailyShort : fin ? UI.finale : spec.hard ? t('hard') : UI.special;
       const bkey = `${bsym}|${btext}`;
-      if (badge.dataset.k !== bkey) { badge.dataset.k = bkey; badge.innerHTML = `${bsym ? `<img src="${symSrc(host, bsym)}" alt="">` : ''}${btext}`; }
+      if (badge.dataset.k !== bkey) { badge.dataset.k = bkey; badge.innerHTML = `${bsym ? `<img src="${bsym.startsWith('img/') ? host.asset(bsym) : symSrc(host, bsym)}" alt="">` : ''}${btext}`; }
       badge.classList.toggle('sp', !!spec.special || mode === 'daily');
       badge.classList.toggle('fin', fin);
       const frac = board ? openCount() / Math.max(1, safeTotal()) : 0;
       $('[data-pfill]').style.width = `${(frac * 100).toFixed(1)}%`;
-      $('[data-ptext]').textContent = badge.hidden ? `${openCount()} / ${safeTotal()} cushions` : `${openCount()} / ${safeTotal()}`;
+      $('[data-ptext]').textContent = badge.hidden ? t('cushionsN', { a: openCount(), b: safeTotal() }) : `${openCount()} / ${safeTotal()}`;
       $('[data-left]').innerHTML = `${SLEEP_IMG}<b>${Math.max(0, catsLeft())}</b>`;
       $('[data-left]').setAttribute('aria-label', t('catsLeft'));
       $('[data-lang]').hidden = shellOwnsLang;
@@ -413,10 +435,10 @@ export default {
 
     function report() {
       host.progress({
-        title: mode === 'daily' ? UI.daily.split(' ')[0] : t('level', { n: level }),
+        title: mode === 'daily' ? UI.dailyShort : t('level', { n: level }),
         fraction: board ? openCount() / Math.max(1, safeTotal()) : 0,
         figure: board ? `${openCount()} / ${safeTotal()}` : '',
-        sub: mode === 'daily' ? today() : roomName(manor.room()),
+        sub: mode === 'daily' ? niceDate() : roomName(manor.room()),
         level,
         summary: t('summary', { n: level, ch: roomName(manor.room()) }),
       });
@@ -445,7 +467,7 @@ export default {
       spec = mode === 'daily' ? { ...dailySpec(today()), chapter: levelSpec(level).chapter } : levelSpec(level);
       board = generate(spec);
       const n = board.cat.length;
-      over = false; busy = false; target = null; scanMarks = null; note = ''; hintCell = -1; combo = 0; popping = new Set(); lastTap = -1; adHearts = 0;
+      over = false; busy = false; target = null; scanMarks = null; note = ''; hintCell = -1; proofCell = -1; sniffed = new Set(); combo = 0; popping = new Set(); lastTap = -1; adHearts = 0;
       pawMode = false;                    // every board starts in Open mode
       dailyStart = 0;
       root.classList.toggle('lantern', spec.special?.type === 'lantern');
@@ -483,14 +505,15 @@ export default {
     let nudgeTimer = null;
     function nudge() {
       clearTimeout(nudgeTimer);
-      if (!host.coach || !board || over || busy || manor.isOpen() || (coachStep && coachStep !== 3) || mode !== 'level') return;
+      if (!onScreen || !host.coach || !board || over || busy || manor.isOpen() || (coachStep && coachStep !== 3) || mode !== 'level') return;
+      if (!root.offsetParent || document.querySelector('.overlays .ovl, .ms-pagecard, .ms-keepcard, .ms-sheet, .panel-sheet.in')) { nudgeTimer = setTimeout(nudge, 1200); return; }
       if (!host.flag('coached')) return;
       if (level >= 2 && !host.flag('coachStars') && starPill) {
-        host.setFlag('coachStars');
         coachStep = 4;
         host.coach.tip({ at: starPill, text: UI.coachStars, hand: starPill });
         host.track('coach_step', { step: 'stars' });
-        nudgeTimer = setTimeout(() => { if (coachStep === 4) { host.coach.clear(); coachStep = 0; nudge(); } }, 6000);
+        // Seen in full (or tapped) counts; covered halfway, it comes back later.
+        nudgeTimer = setTimeout(() => { if (coachStep === 4) { host.setFlag('coachStars'); host.coach.clear(); coachStep = 0; nudge(); } }, 6000);
       } else if (!manor.letterRead()) {
         const d = $('[data-diary]');
         coachStep = 3;
@@ -499,7 +522,44 @@ export default {
       }
     }
 
+    /** Pointers belong to the board: away when anything covers it, back when it is clear again. */
+    let pointerWas = 0;
+    let onScreen = false;              // the board is the screen in front
+    function clearPointers() {
+      clearTimeout(nudgeTimer);
+      if (coachStep) pointerWas = coachStep;
+      host.coach?.clear();
+      coachStep = 0;
+    }
+    function restorePointers() {
+      setTimeout(() => {
+        if (!onScreen || mode !== 'level' || !board || over || busy || manor.isOpen() || !root.offsetParent || document.querySelector('.overlays .ovl, .ms-pagecard, .ms-keepcard, .panel-sheet.in')) return;
+        const was = pointerWas; pointerWas = 0;
+        if (was === 1 && level === 1 && !host.flag('coached')) coach(1);
+        else nudge();
+      }, 450);
+    }
+
+    /** Anything that opens over the board (a shell card or tab, a keepsake, the decorate offer) takes the pointer away. */
+    let watching = false;
+    function watchCovers() {
+      if (watching) return;
+      const scr = root.closest('.screen'), ovl = document.querySelector('.overlays');
+      if (!scr) return;
+      watching = true;
+      const covered = () => !!document.querySelector('.overlays .ovl, .ms-pagecard, .ms-keepcard, .ms-sheet, .panel-sheet.in') || manor.isOpen();
+      const mo = new MutationObserver(() => {
+        if (covered() || !onScreen) { if (coachStep) clearPointers(); }
+        else if (pointerWas) restorePointers();
+      });
+      mo.observe(scr, { childList: true });
+      const ps = document.querySelector('.panel-sheet');
+      if (ps) mo.observe(ps, { attributes: true, attributeFilter: ['class'] });
+      if (ovl) mo.observe(ovl, { childList: true });
+    }
+
     function coach(step) {
+      if (!onScreen) { pointerWas = step; return; }
       coachStep = step;
       if (!host.coach) return;
       if (step === 1) {
@@ -535,7 +595,7 @@ export default {
     /** Uncover one cushion. Returns false when it cost the last heart. */
     function uncover(i) {
       if (open[i] || flag[i] || woke[i] || board.wall[i]) return true;
-      if (i === hintCell) hintCell = -1;
+      if (i === hintCell) { hintCell = -1; proofCell = -1; }
       if (knot[i]) { knot[i] = false; host.sound('lift'); haptic(6); return true; }
       if (board.cat[i]) {
         // Guard (Soot's perk, or a friendship reward) catches a cat before it wakes, from level 7.
@@ -544,7 +604,7 @@ export default {
           guardUsed = (guardUsed | 0) + 1; flag[i] = true;
           host.sound('error'); haptic(20);
           catPop($('[data-stage]'), cells[i], host.asset('img/board-cat-woken.png'));
-          say(UI.guardSave.replace('{cat}', CAT_NAMES[wornId] || 'Your cat'), 4000);
+          say(UI.guardSave.replace('{cat}', CAT_NAMES[wornId] || UI.yourCat), 4000);
           return true;
         }
         const safe = mode === 'level' && level <= PROTECTED();
@@ -570,6 +630,7 @@ export default {
     function toggleFlag(i) {
       if (open[i] || woke[i] || board.wall[i]) return;
       flag[i] = !flag[i];
+      if (!flag[i]) sniffed.delete(i);
       if (flag[i]) host.stat('paws');
       host.sound(flag[i] ? 'drop' : 'undo');
       haptic(8);
@@ -676,6 +737,7 @@ export default {
       if (mode === 'daily') { await winDaily(); return; }
       if (mode === 'replay') { await winReplay(); return; }
       const won = level;
+      if (!host.flag('coached')) host.setFlag('coached');   // level 1's pointers are done once it is won
       const got = lost === 0 ? 3 : lost === 1 ? 2 : 1;
       const before = stars[won] || 0;
       const couldBefore = manor.canRestore();
@@ -837,7 +899,7 @@ export default {
             <button class="ms-mbtn wide primary ms-paybtn" data-pay ${short ? 'disabled' : ''}>
               ${host.art.coin(22)}${UI.heartUse.replace('{n}', price)}</button>
             ${short ? `<p class="ms-heartneed">${UI.heartNeed.replace('{n}', short)} <span>(${have} / ${price})</span></p>` : ''}
-            ${canBuy ? `<button class="ms-mbtn wide ms-buybtn" data-buy>${UI.heartBuy}</button>` : ''}
+            ${canBuy && short ? `<button class="ms-mbtn wide ms-buybtn" data-buy>${UI.heartBuy}</button>` : ''}
             ${canAd ? `<button class="ms-mbtn wide ms-adbtn" data-ad>▶ ${UI.heartAd}</button>` : ''}
             <button class="ms-mbtn wide ghost" data-give>${UI.heartGive}</button>
           </div>`;
@@ -894,16 +956,34 @@ export default {
       return how === 'ad' || (how === 'coins' && host.wallet.spend(price(b), `booster_${b}`));
     }
 
+    /**
+     * Sniff finds one sleeping cat and paw-marks it, for sure. It goes for a
+     * cat the player hasn't marked, next to the open floor if it can. Only
+     * when every cat is marked does it look at the player's paws, and take
+     * one off a cushion with no cat under it. Nothing to find costs nothing.
+     */
     async function sniff() {
-      const safe = (i) => !open[i] && !board.cat[i] && !board.wall[i];
-      let pool = board.cat.map((_, i) => i).filter((i) => safe(i) && board.nb[i].some((j) => open[j]));
-      if (!pool.length) pool = board.cat.map((_, i) => i).filter(safe);
-      if (!pool.length || !(await pay('sniff'))) return;
-      const i = pool[Math.floor(Math.random() * pool.length)];
-      flag[i] = false; knot[i] = false;
+      const live = (i) => board.cat[i] && !woke[i] && !open[i];
+      const near = (i) => board.nb[i].some((j) => open[j]);
+      let pool = board.cat.map((_, i) => i).filter((i) => live(i) && !flag[i] && near(i));
+      if (!pool.length) pool = board.cat.map((_, i) => i).filter((i) => live(i) && !flag[i]);
+      const wrong = board.cat.map((_, i) => i).filter((i) => flag[i] && !board.cat[i] && !open[i]);
+      if (!pool.length && !wrong.length) { say(UI.sniffNone, 3000); host.sound('tap'); return; }
+      if (!(await pay('sniff'))) { drawHud(); return; }
       host.track('booster_used', { level, booster: 'sniff' });
-      uncover(i);
+      const fix = !pool.length;
+      const i = fix ? wrong[0] : pool[Math.floor(Math.random() * pool.length)];
+      busy = true;
+      centerOn(i);
+      const scr = root.closest('.screen') || root;
+      const btn = $('.ms-tool[data-tool="sniff"]');
+      await flyTo(scr, btn, cells[i], host.asset('img/icon-sniff.png'), 1, { size: 46, ms: 700 });
+      busy = false;
+      if (fix) { flag[i] = false; sniffed.delete(i); host.sound('undo'); say(UI.sniffWrong, 3000); }
+      else { flag[i] = true; knot[i] = false; sniffed.add(i); host.stat('paws'); host.sound('drop'); haptic([0, 12, 30, 12]); say(UI.sniffFound, 2600); }
+      cells[i].classList.remove('sniffpop'); void cells[i].offsetWidth;
       await after();
+      cells[i]?.classList.add('sniffpop');
     }
 
     function area(i, lo, hi) {
@@ -941,9 +1021,9 @@ export default {
      * kinds of logic the board was built for (one number, a pair of numbers).
      * Falls back to any safe cushion next to the open floor.
      */
-    function findHint() {
+    function findHint(any = false) {
       const n = board.cat.length, nb = board.nb;
-      const isCat = new Uint8Array(n), safe = new Uint8Array(n);
+      const isCat = new Uint8Array(n), safe = new Uint8Array(n), proof = new Int32Array(n).fill(-1);
       for (let i = 0; i < n; i += 1) if (woke[i]) isCat[i] = 1;
       for (let round = 0; round < 60; round += 1) {
         let moved = false;
@@ -957,38 +1037,48 @@ export default {
             if (isCat[j]) m -= 1; else u.push(j);
           }
           if (!u.length) continue;
-          if (m === 0) { u.forEach((j) => { safe[j] = 1; }); moved = true; }
+          if (m === 0) { u.forEach((j) => { safe[j] = 1; if (proof[j] < 0) proof[j] = i; }); moved = true; }
           else if (m === u.length) { u.forEach((j) => { isCat[j] = 1; }); moved = true; }
-          else cons.push({ u, m });
+          else cons.push({ u, m, i });
         }
         if (!moved) {
           for (let a = 0; a < cons.length && !moved; a += 1) for (let b = 0; b < cons.length && !moved; b += 1) {
             const A = cons[a], B = cons[b];
             if (a === b || A.u.length >= B.u.length || !A.u.every((x) => B.u.includes(x))) continue;
             const rest = B.u.filter((x) => !A.u.includes(x)), m = B.m - A.m;
-            if (m === 0) { rest.forEach((j) => { safe[j] = 1; }); moved = true; }
+            if (m === 0) { rest.forEach((j) => { safe[j] = 1; if (proof[j] < 0) proof[j] = B.i; }); moved = true; }
             else if (m === rest.length) { rest.forEach((j) => { isCat[j] = 1; }); moved = true; }
           }
         }
         if (!moved) break;
       }
       const covered = (i) => !open[i] && !woke[i] && !board.wall[i] && !board.cat[i];
-      for (let i = 0; i < n; i += 1) if (safe[i] && covered(i)) return i;
+      // Prefer a proven cushion the player hasn't marked; the numbers say why.
+      for (const skipFlags of [true, false]) {
+        for (let i = 0; i < n; i += 1) if (safe[i] && covered(i) && !(skipFlags && flag[i])) { lastProof = proof[i]; return i; }
+      }
+      lastProof = -1;
+      if (!any) return -1;
       for (let i = 0; i < n; i += 1) if (covered(i) && nb[i].some((j) => open[j])) return i;
       for (let i = 0; i < n; i += 1) if (covered(i)) return i;
       return -1;
     }
+    let lastProof = -1;
+    const niceDate = () => {
+      try { return new Date().toLocaleDateString(document.documentElement.lang || 'en', { weekday: 'short', day: 'numeric', month: 'short' }); } catch { return today(); }
+    };
 
     async function hint() {
       const i = findHint();
-      if (i < 0) { say(UI.hintNone); return; }
+      if (i < 0) { say(level >= UNLOCK.sniff ? UI.hintNoneSniff : UI.hintNone, 3200); host.sound('error'); return; }
+      const proof = lastProof;
       if (!(await pay('hint'))) { drawHud(); return; }
       host.track('booster_used', { level, booster: 'hint' });
-      flag[i] = false;
-      hintCell = i;
+      flag[i] = false; sniffed.delete(i);
+      hintCell = i; proofCell = proof;
       host.sound('unlock');
       draw();
-      say(UI.hintTip, 3500);
+      say(proof >= 0 ? UI.hintTip : UI.hintTipAny, 3800);
       centerOn(i);
       host.save();
     }
@@ -1040,8 +1130,12 @@ export default {
       e.preventDefault();
       const el = e.target.closest('.ms-cell');
       if (!el || over || busy || level < UNLOCK.paw) return;
+      const i = Number(el.dataset.i);
       clearTimeout(pressTimer);
-      toggleFlag(Number(el.dataset.i));
+      // On a phone a long press also fires this event: the timer already marked it.
+      if (pressed === i) return;
+      pressed = e.pointerType === 'mouse' || !e.pointerType ? -1 : i;
+      toggleFlag(i);
       after();
     });
     $('[data-diary]').addEventListener('click', () => {
@@ -1100,16 +1194,19 @@ export default {
         cur: mode !== 'level' ? levelCur : over ? null : snapshot(),
       }),
       show() {
+        onScreen = true;
         fit();
+        watchCovers();
+        restorePointers();
         roomShown = '';
         if (board) { setRoom(); drawStarPill(); }
         const scr = root.closest('.screen');
         scr?.classList.remove('ms-enter'); void scr?.offsetWidth; scr?.classList.add('ms-enter');
         ambience(true);
       },
-      hide() { ambience(false); host.coach?.clear(); if (coachStep) coachStep = 0; if (mode === 'daily' && !over) backToLevels(); if (mode === 'replay') backFromReplay(); },
-      pause() { ambience(false); },
-      resume() { ambience(true); },
+      hide() { onScreen = false; ambience(false); clearPointers(); if (coachStep) coachStep = 0; if (mode === 'daily' && !over) backToLevels(); if (mode === 'replay') backFromReplay(); },
+      pause() { ambience(false); clearPointers(); },
+      resume() { ambience(true); restorePointers(); },
       relayout() { fit(); },
       setPerk(config) {
         const before = maxHearts();
@@ -1135,15 +1232,35 @@ export default {
       },
       canOffer: (task) => !task.from || level >= task.from,
       rewardValue: () => heartPrice(level),
-      progressRows: () => ({
-        blurb: t('blurb'),
-        tiles: [
-          { value: level, label: t('tileLevel') },
-          { value: totalStars(), label: t('tileStars') },
-          { value: perfects, label: t('tilePerfect') },
-          { value: manor.balance(), label: 'stars to spend' },
-        ],
-      }),
+      dailyCard: () => manor.dailyCard(),
+      progressRows: () => {
+        const st = manor.stats();
+        const r = st.room;
+        const pct = Math.round((st.objects / 120) * 100);
+        const ic = (src) => `<img class="ms-tic" src="${src}" alt="">`;
+        const img = (p) => host.asset(p);
+        const banner = `<span class="ms-pbanner">
+            <img class="ms-pb-room" src="${lastRoomUrl || img(`img/room-${r}.jpg`)}" alt="">
+            <span class="ms-pb-shade"></span>
+            <span class="ms-pb-cat">${host.art.cat('cheer', 92, 'ms-pb-catimg', hostOf(r))}</span>
+            <span class="ms-pb-text"><small>${UI.pRoom.replace('{n}', r)}</small><b>${roomName(r)}</b></span>
+          </span>
+          <span class="ms-pmanor"><span class="ms-pm-l">${UI.pManor}</span><span class="ms-pm-bar"><i style="width:${Math.max(2, pct)}%"></i></span><b>${pct}%</b></span>`;
+        return {
+          blurb: banner,
+          tiles: [
+            { value: `${ic(img('img/cushion-gingham.png'))}${level}`, label: UI.pLevel },
+            { value: `${ic(img('img/star-seal.png'))}${st.earned}`, label: UI.pStars },
+            { value: `${ic(symSrc(host, 'trophy'))}${st.rooms}<small>/20</small>`, label: UI.pRooms },
+            { value: `${ic(img('img/deco/r1-0-0.webp'))}${st.objects}<small>/120</small>`, label: UI.pObjects },
+            { value: `${ic(img('img/icon-diary.png'))}${st.keepsakes}<small>/40</small>`, label: UI.pKeeps },
+            { value: `${ic(img('img/icon-daily.png'))}${st.streak}`, label: UI.pStreak },
+            { value: `${ic(img('img/friendship-heart.png'))}${st.friends}<small>/5</small>`, label: UI.pFriends },
+            { value: `${ic(symSrc(host, 'heart'))}${perfects}`, label: UI.pPerfect },
+            { value: `${ic(img('img/star-seal.png'))}${manor.balance()}`, label: UI.pSpend },
+          ],
+        };
+      },
       dev: {
         buttons: [
           { id: 'win', label: 'Win level', run: () => { board.cat.forEach((c, i) => { if (!c && !board.wall[i]) open[i] = true; }); after(); } },
