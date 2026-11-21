@@ -597,7 +597,7 @@ export default {
           guardUsed = (guardUsed | 0) + 1; flag[i] = true;
           host.sound('error'); haptic(20);
           catPop($('[data-stage]'), cells[i], host.asset('img/board-cat-woken.png'));
-          say(UI.guardSave.replace('{cat}', CAT_NAMES[wornId] || 'Your cat'), 4000);
+          say(UI.guardSave.replace('{cat}', CAT_NAMES[wornId] || UI.yourCat), 4000);
           return true;
         }
         const safe = mode === 'level' && level <= PROTECTED();

@@ -1,4 +1,6 @@
 import { TEXTS } from './texts.js';
+import { STORY } from './texts-story.js';
+import { DECO_NAMES } from './deco-data.js';
 import { getLang } from './strings.js';
 /**
  * Whiskerwood Manor: the story layer's words. Room names are in all six
@@ -250,6 +252,7 @@ export const UI = {
   keepFrom: '{room} · keepsake {i} of 2', tapContinue: 'Tap to continue', finale: 'Finale',
   // Progress tab
   pRoom: 'Room {n} of 20', pManor: 'Manor decorated', pRooms: 'rooms done', pObjects: 'objects placed', pKeeps: 'keepsakes',
+  shareText: 'I decorated the {room} in Meowsweeper!', yourCat: 'Your cat',
   pStars: 'stars earned', pLevel: 'level', pPerfect: 'perfect levels', pStreak: 'puzzle streak', pFriends: 'cat friends', pSpend: 'stars to spend',
 };
 
@@ -349,4 +352,11 @@ if (L) {
   Object.assign(SPECIAL_TEXT, L.special || {});
   (L.intro || []).forEach((text, i) => { if (INTRO[i]) INTRO[i].text = text; });
   (L.styles || []).forEach((name, i) => { if (STYLES[i]) STYLES[i].name = name; });
+}
+const S = STORY[getLang()];
+if (S) {
+  S.deco.forEach((row, r) => row.forEach((name, o) => { if (DECO_NAMES[r]) DECO_NAMES[r][o] = name; }));
+  S.keep.forEach((pair, r) => pair.forEach(([name, line], i) => { if (KEEPSAKES[r]?.[i]) KEEPSAKES[r][i] = { name, line }; }));
+  S.notes.forEach((note, i) => { DAILY_NOTES[i] = note; });
+  UI.shareText = S.share; UI.yourCat = S.yourCat;
 }

@@ -762,12 +762,12 @@ export function createManor(host, game) {
     x.fillStyle = '#f3dcbd'; x.fillRect(0, 0, out.width, out.height);
     x.drawImage(a, 10, 60); x.drawImage(b, W + 20, 60);
     x.fillStyle = '#3e2210'; x.font = '900 30px Nunito, sans-serif'; x.textAlign = 'center';
-    x.fillText(`${roomName(r)} · Whiskerwood Manor`, out.width / 2, 42);
+    x.fillText(`${roomName(r)} · ${UI.manor}`, out.width / 2, 42);
     x.font = '800 22px Nunito, sans-serif';
     x.fillText(UI.before, 10 + W / 2, H + 92); x.fillText(UI.after, W + 20 + W / 2, H + 92);
     const blob = await new Promise((res) => out.toBlob(res, 'image/png'));
     host.track('share_room', { room: r, objects: addedCount(r) });
-    await host.shareFile?.({ blob, name: `whiskerwood-${r}.png`, text: `I decorated the ${roomName(r)} in Meowsweeper!`, from: 'room' });
+    await host.shareFile?.({ blob, name: `whiskerwood-${r}.png`, text: fmt(UI.shareText, { room: roomName(r) }), from: 'room' });
   }
 
   /* ---- daily puzzle ---- */
