@@ -372,6 +372,8 @@ export function createManor(host, game) {
       </div>`, 'ms-manor');
     const canvas = el.querySelector('.ms-mcanvas');
     drawScene(host, canvas, view, room.cur, { locked });
+    // On a very short screen the picture is small: the object strip below does the job of the + markers.
+    requestAnimationFrame(() => { const f = el.querySelector('[data-frame]'); f?.classList.toggle('tiny', f.clientHeight < 230); });
     const before = el.querySelector('.ms-before');
     if (before) {
       drawScene(host, before, view, Array(OBJS).fill(-1));
@@ -971,6 +973,21 @@ export function createManor(host, game) {
     balance,
     sync,
     devStars: (n) => { state.bonus += n; game.save(); },
+    /** Numbers for the Progress tab. */
+    stats: () => {
+      sync();
+      let objects = 0, rooms = 0;
+      for (let r = 1; r <= openRooms(); r += 1) { const n = R(r).cur.filter((v) => v >= 0).length; objects += n; if (n >= OBJS) rooms += 1; }
+      const d = state.daily, t = today();
+      return {
+        room: selRoom(), objects, rooms, keepsakes: state.keep.length,
+        friends: CATS5.filter((c) => friendLevel(c) >= 1).length,
+        streak: d.last === t || d.last === dayBefore(t) ? d.streak : 0,
+        earned: game.stars() + state.bonus,
+      };
+    },
+    /** A cat's friendship, for the Cats tab: level 0-5, and its line once it has one. */
+    friendOf: (c) => (CATS5.includes(c) ? { level: friendLevel(c), line: friendLevel(c) >= 2 ? FRIEND_LINES[c][Math.min(3, friendLevel(c) - 2)] : '' } : null),
   };
 }
 
