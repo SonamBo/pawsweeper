@@ -47,6 +47,7 @@ export default {
   styles: ['style.css'],   // loaded before create(), so the first layout is styled
 
   // All optional. Read by the shell without starting the game.
+  catRoster: { hide: ['soot'], showLocked: true },  // optional: cats the Cats tab leaves out, and whether locked cats show their face and name
   perks: {                 // what each cat does in THIS game
     mittens: { text: 'Undo costs 10 instead of 20.', config: { undoCost: 10 } },
   },
@@ -81,10 +82,12 @@ says so. A game with no `cosmetics` shows an empty Shop section.
 | `show()` / `hide()` | no | the game screen became visible or hidden |
 | `pause()` / `resume()` | no | app backgrounded, or a card is covering the game |
 | `onBack()` | no | return `true` if the game handled the back press |
+| `onLobbyBack()` | no | Android back while the lobby shows: return `true` if the game handled it (left a mode it drew there) |
 | `restart()` | no | if present, the pause menu offers Restart |
 | `setPerk(config)` | no | the worn cat changed |
 | `setCosmetic(id)` | no | a cosmetic was bought or worn |
 | `progressRows()` | no | a table for the Progress tab |
+| `dailyCard()` | no | HTML for the top of the Daily tab; an element with `data-open-extra="<id>"` in it opens like the game's lobby button `<id>` |
 | `canOffer(task)` | no | return `false` to keep a task out of today's draw, e.g. one the player cannot do yet |
 | `rewardValue()` | no | coins a reward is worth right now; the Rewards Box pays about half of it. Money Sort returns its Sort price. Default 150 |
 | `relayout()` | no | the screen size or orientation changed |

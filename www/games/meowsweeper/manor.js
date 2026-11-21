@@ -453,6 +453,8 @@ export function createManor(host, game) {
       </div>`, 'ms-manor');
     const canvas = el.querySelector('.ms-mcanvas');
     drawScene(host, canvas, view, room.cur, { locked });
+    // On a very short screen the picture is small: the object strip below does the job of the + markers.
+    requestAnimationFrame(() => { const f = el.querySelector('[data-frame]'); f?.classList.toggle('tiny', f.clientHeight < 230); });
     const before = el.querySelector('.ms-before');
     if (before) {
       drawScene(host, before, view, Array(OBJS).fill(-1));
@@ -888,31 +890,44 @@ export function createManor(host, game) {
     x.fillStyle = '#f3dcbd'; x.fillRect(0, 0, out.width, out.height);
     x.drawImage(a, 10, 60); x.drawImage(b, W + 20, 60);
     x.fillStyle = '#3e2210'; x.font = '900 30px Nunito, sans-serif'; x.textAlign = 'center';
-    x.fillText(`${roomName(r)} · Whiskerwood Manor`, out.width / 2, 42);
+    x.fillText(`${roomName(r)} · ${UI.manor}`, out.width / 2, 42);
     x.font = '800 22px Nunito, sans-serif';
     x.fillText(UI.before, 10 + W / 2, H + 92); x.fillText(UI.after, W + 20 + W / 2, H + 92);
     const blob = await new Promise((res) => out.toBlob(res, 'image/png'));
     host.track('share_room', { room: r, objects: addedCount(r) });
-    await host.shareFile?.({ blob, name: `whiskerwood-${r}.png`, text: `I decorated the ${roomName(r)} in Meowsweeper!`, from: 'room' });
+    await host.shareFile?.({ blob, name: `whiskerwood-${r}.png`, text: fmt(UI.shareText, { room: roomName(r) }), from: 'room' });
   }
 
   /* ---- daily puzzle ---- */
 
-  function openDaily() {
-    const d = state.daily, t = today(), solved = d.last === t;
+  /** The week so far, Monday first: { day, done, today }. */
+  function weekOf(t) {
     const now = new Date(`${t}T12:00:00`);
     const monday = new Date(now); monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-    const week = Array.from({ length: 7 }, (_, i) => { const x = new Date(monday); x.setDate(monday.getDate() + i); return today(x); });
-    const cal = week.map((day, i) => `<span class="ms-day ${d.days.includes(day) ? 'done' : ''} ${day === t ? 'today' : ''}"><small>${'MTWTFSS'[i]}</small>${d.days.includes(day) ? PAW : ''}</span>`).join('');
+    return Array.from({ length: 7 }, (_, i) => { const x = new Date(monday); x.setDate(monday.getDate() + i); const day = today(x); return { day, done: state.daily.days.includes(day), today: day === t, x }; });
+  }
+  const dayLetter = (x) => { try { return x.toLocaleDateString(document.documentElement.lang || 'en', { weekday: 'narrow' }); } catch { return ''; } };
+  const streakNow = () => { const d = state.daily, t = today(); return d.last === t || d.last === dayBefore(t) ? d.streak : 0; };
+
+  function openDaily() {
+    const d = state.daily, t = today(), solved = d.last === t;
+    const cal = weekOf(t).map((w) => `<span class="ms-day ${w.done ? 'done' : ''} ${w.today ? 'today' : ''}"><small>${esc(dayLetter(w.x))}</small>${w.done ? PAW : ''}</span>`).join('');
     const best = d.best.length
       ? d.best.slice(0, 5).map((b, i) => `<li><b>${i + 1}</b><span>${mmss(b.ms)}</span><span>${'♥'.repeat(b.hearts)}</span><small>${b.day.slice(5)}</small></li>`).join('')
-      : '<li class="empty">–</li>';
-    const sk = d.last === t || d.last === dayBefore(t) ? d.streak : 0;
+      : `<li class="empty">${UI.dailyFirst}</li>`;
+    const sk = streakNow();
+    const toChest = 7 - (sk % 7);
+    const coins = game.dailyCoins?.() ?? 60;
+    const note = DAILY_NOTES[dayNum(t) % DAILY_NOTES.length];
     const el = open(`${topBar(UI.daily, esc(sk ? fmt(sk === 1 ? UI.streak1 : UI.streak, { n: sk }) : UI.streak0), `<img class="ms-dicon" src="${host.asset('img/icon-daily.png')}" alt="">`)}
-      <div class="ms-cal">${cal}</div>
-      <div class="ms-drow"><b>${UI.best}</b><ol class="ms-best">${best}</ol></div>
-      ${solved ? `<div class="ms-drow ms-note"><small>${UI.note}</small><p class="ms-hand">${esc(DAILY_NOTES[dayNum(t) % DAILY_NOTES.length])}</p></div>` : ''}
-      <div class="ms-grow"></div>
+      <div class="ms-dscroll">
+        <div class="ms-cal">${cal}</div>
+        <div class="ms-drow ms-chestrow"><img src="${host.asset('img/chest-open.png')}" alt="">
+          <span><b>${fmt(UI.chestIn, { n: Math.max(1, toChest) })}</b><span class="ms-chestbar"><i style="width:${(((7 - toChest) / 7) * 100).toFixed(0)}%"></i></span></span><em>${host.art.coin(16)} 300</em></div>
+        <div class="ms-drow ms-rewardrow"><small>${UI.dailyReward}</small><p class="ms-reward">${host.art.coin(20)} +${coins} · ${stars()} +3</p></div>
+        <div class="ms-drow ms-note ${solved ? '' : 'sealed'}"><small>${UI.note}</small>${solved ? `<p class="ms-hand">${esc(note)}</p>` : `<p class="ms-sealed"><img src="${host.asset('img/item-duchess-letter.png')}" alt="">${UI.noteSealed}</p>`}</div>
+        <div class="ms-drow"><b>${UI.best}</b><ol class="ms-best">${best}</ol></div>
+      </div>
       ${solved ? `<p class="ms-mdone">${UI.dailyDone}</p>` : ''}
       <div class="ms-mfoot">
         <button class="ms-mbtn wide ${solved ? 'primary' : ''}" data-act="manor">${UI.manor}</button>
@@ -926,6 +941,18 @@ export function createManor(host, game) {
       else if (b.dataset.act === 'daily') { close(); game.onDaily(); }
     });
   }
+
+  /** A card for the top of the shell's Daily tab: today's puzzle, its streak and reward. */
+  function dailyCard() {
+    const t = today(), solved = state.daily.last === t, sk = streakNow();
+    const week = weekOf(t).map((w) => `<i class="${w.done ? 'on' : ''} ${w.today ? 'today' : ''}"></i>`).join('');
+    return `<button class="ms-dailycard ${solved ? 'solved' : ''}" data-open-extra="daily">
+      <img class="ms-dc-icon" src="${host.asset('img/icon-daily.png')}" alt="">
+      <span class="ms-dc-main"><b>${UI.daily}</b><small>${solved ? UI.dailyDone : esc(sk ? fmt(sk === 1 ? UI.streak1 : UI.streak, { n: sk }) : UI.streak0)}</small><span class="ms-dc-week">${week}</span></span>
+      <span class="ms-dc-go">${solved ? '✓' : `${host.art.coin(14)} +${game.dailyCoins?.() ?? 60}`}</span>
+    </button>`;
+  }
+
   const dayNum = (s) => Math.floor(Date.parse(`${s}T12:00:00Z`) / 864e5);
 
   function paperCard(top, title, text, extra = '') {
@@ -1042,6 +1069,11 @@ export function createManor(host, game) {
   }
 
   return {
+    /** Android back in the lobby: leave decorating first. */
+    lobbyBack() {
+      const sh = lobbyScreen()?.querySelector('.ms-sheet.in [data-x]');
+      if (sh) { sh.click(); return true; }
+      if (!decor) return false; setDecor(false); host.sound('tap'); return true; },
     load(saved) {
       const f = fresh();
       const L = lvl();
@@ -1099,6 +1131,24 @@ export function createManor(host, game) {
     balance,
     sync,
     devStars: (n) => { state.bonus += n; game.save(); },
+    dailyCard,
+    /** Objects still to place before the next room opens, once its 10 levels are won (0 otherwise). */
+    objectsToOpen: () => (levelsHere() >= ROOM_LEVELS && state.chap <= ROOM_COUNT * 50 ? OBJS - addedCount(newestRoom()) : 0),
+    /** Numbers for the Progress tab. */
+    stats: () => {
+      sync();
+      let objects = 0, rooms = 0;
+      for (let r = 1; r <= openRooms(); r += 1) { const n = R(r).cur.filter((v) => v >= 0).length; objects += n; if (n >= OBJS) rooms += 1; }
+      const d = state.daily, t = today();
+      return {
+        room: selRoom(), objects, rooms, keepsakes: state.keep.length,
+        friends: CATS5.filter((c) => friendLevel(c) >= 1).length,
+        streak: d.last === t || d.last === dayBefore(t) ? d.streak : 0,
+        earned: game.stars() + state.bonus,
+      };
+    },
+    /** A cat's friendship, for the Cats tab: level 0-5, and its line once it has one. */
+    friendOf: (c) => (CATS5.includes(c) ? { level: friendLevel(c), line: friendLevel(c) >= 2 ? FRIEND_LINES[c][Math.min(3, friendLevel(c) - 2)] : '' } : null),
   };
 }
 

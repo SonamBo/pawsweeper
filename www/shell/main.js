@@ -626,6 +626,7 @@ async function boot() {
   panels.onBuy = buy;
   panels.onClaim = onClaim;
   panels.onClose = closePanel;
+  panels.onExtra = (id) => { closePanel(); track('lobby_button', { id, from: 'tab' }); instance.openFromLobby?.(id); showScreen('game'); };
 
   wallet.onChange((coins, delta, reason) => {
     onCoins(delta, reason);
@@ -1095,6 +1096,7 @@ function installBridge() {
         showScreen('lobby');
         return true;
       }
+      if (screen === 'lobby' && instance?.onLobbyBack?.()) return true;   // e.g. leave a mode the game drew in the lobby
       return false;
     },
     flush: save,

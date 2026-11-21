@@ -1,3 +1,7 @@
+import { TEXTS } from './texts.js';
+import { STORY } from './texts-story.js';
+import { DECO_NAMES } from './deco-data.js';
+import { getLang } from './strings.js';
 /**
  * Whiskerwood Manor: the story layer's words. Room names are in all six
  * languages; tasks, diary pages and cat lines are English for now (other
@@ -190,11 +194,11 @@ export const DIARY = [
 
 /** One line on a win, in the host cat's voice. */
 export const WIN_LINES = {
-  marmalade: ['Okay okay okay, you did it!', 'I helped! Mostly.', 'Again! Again!', 'Did you see? I was very still.', 'Snack time? Snack time!'],
-  mittens: ['Acceptable. Barely.', 'Adequate work.', 'Hmph. Not bad.', 'The Duchess would approve. Probably.', 'Fine. You may stay.'],
+  marmalade: ['You did it! I helped. Mostly.', 'Again! Again!', 'I stayed very still. Did you see?', 'Snack time? Snack time!', 'Best Caretaker ever!'],
+  mittens: ['Acceptable. Barely.', 'Hmph. Not bad at all.', 'Neat and tidy. I approve.', 'You may continue.', 'Fine work. Don’t let it go to your head.'],
   biscuit: ['…five more minutes…', 'Mmm. Nice and quiet.', 'That was cosy.', 'Wake me for dinner.', 'Zzz… good job…'],
-  patch: ['Psst. Nice moves.', 'Sneaky. I like it.', 'Not bad for a beginner.', 'I found a secret passage. Later.', 'Nobody woke. Respect.'],
-  pepper: ['She solved them at midnight too.', 'Quiet as moonlight.', 'The house remembers you now.', 'Good. The castle light is on.', 'Well done, Caretaker.'],
+  patch: ['Psst. Nice moves.', 'Sneaky. I like it.', 'Nobody woke up. Respect.', 'Smooth! Like a cat.', 'Ha! Too easy.'],
+  pepper: ['Quiet as moonlight.', 'Not one whisker stirred.', 'Well done, Caretaker.', 'Silent and clever. Good.', 'The house sleeps soundly.'],
 };
 
 /** One line when a task is done. */
@@ -213,13 +217,45 @@ export const INTRO = [
 ];
 
 export const UI = {
-  manor: 'Whiskerwood Manor', restore: 'Restore', stars: 'Stars', diary: 'Diary', play: 'Play level {n}',
-  back: 'Back', chapter: 'Chapter {n}', roomDone: 'Room restored!', needStars: 'Win levels to earn ★ {n} more',
-  task: 'Task {i} of 6', locked: 'Reach chapter {n} to open this room', newPage: 'New diary page!',
-  read: 'Read', page: 'Page {i}', pageLocked: 'Restore {n} tasks to find it', pageLocked1: 'Restore 1 task to find it', chapterDone: 'Chapter complete!',
-  nextOpen: 'The {room} is open. Restore this room with your stars.', next: 'Next', skip: 'Skip', go: 'Let’s go!',
-  starsGain: '+{n} ★ for the manor', hintTip: 'Psst… that glowing cushion is safe.', hintNone: 'No safe cushion to show right now.',
-  zoomFit: 'Fit board', zoomIn: 'Zoom in',
+  manor: 'Whiskerwood Manor', stars: 'Stars', play: 'Play level {n}', back: 'Back', next: 'Next', skip: 'Skip', go: 'Let’s go!',
+  starsGain: '+{n} stars for the manor',
+  hintTip: 'Psst! That glowing cushion is safe. The pulsing number shows why.',
+  hintTipAny: 'Psst! That glowing cushion is safe.',
+  hintNone: 'Nothing is certain here. Trust your best guess!',
+  hintNoneSniff: 'Nothing is certain here… try Sniff!',
+  sniffFound: 'Sniff sniff… found a sleeping cat!',
+  sniffWrong: 'Sniff… no cat under that paw! I took it off.',
+  sniffNone: 'All the cats are already marked!',
+  zoomFit: 'Fit board', zoomIn: 'Zoom in', open: 'Open', mark: 'Mark', special: 'Special board',
+  daily: 'Puzzle of the day', dailyShort: 'Daily puzzle', dailyTip: 'Today’s puzzle! Everyone plays the same board.',
+  chestIn: '{n} more days to the weekly chest', dailyReward: 'Today’s reward', noteSealed: 'Solve it to read the Duchess’s note.', dailyFirst: 'Your first time goes here!', dailyDone: 'Solved today!', dailyPlay: 'Play today’s puzzle',
+  streak: '{n}-day streak', streak1: '1-day streak', streak0: 'Start a streak today', best: 'Your best times',
+  note: 'From the Duchess’s household book', week: 'This week',
+  cats: 'Cats', friendship: 'Friendship', perkUp: 'Perk upgrade: {t}', nextAt: '{n} more to level {l}', maxLevel: 'Best friends',
+  friendUp: '{cat} likes you more! Friendship level {n}.',
+  share: 'Share my room', before: 'Before', after: 'After',
+  settings: 'Settings', cbNumbers: 'Colour-blind number marks', leftHanded: 'Left-handed layout', vibration: 'Vibration',
+  coach1: 'Tap this cushion. No cat sleeps here.',
+  coach2: 'This 1 means one cat sleeps in the 8 squares around it.',
+  coachDiary: 'A letter from the Duchess! Tap to read it.',
+  coachStars: 'These are your stars. Tap to decorate the room!',
+  opensAt: 'opens at level {n}', lvl: 'Lvl {n}', lvlShort: 'Lv {n}',
+  guardSave: 'Phew! {cat} caught that one. A cat sleeps there.',
+  protect: 'Oops, a cat woke! While you learn, it costs no heart.',
+  replay: 'Replay', replayTitle: 'Replay levels', replayLine: 'Play a level again to win the stars you missed.',
+  replayOf: 'Replay · level {n}', replayDone: 'Back to level {n}',
+  heartTitle1: 'Out of hearts!', heartBuy: 'Get coins', heartUse: 'Use {n} coins', heartAd: 'Watch an ad', heartGive: 'Give up',
+  heartLine1: 'Keep going with 1 extra heart.', heartLine2: 'Last chance: one more heart for this level.', heartNeed: 'You need {n} more coins.',
+  tapSpot: 'Tap a + to place something new.', needMore: 'Win levels for more stars:',
+  decorate: 'Decorate', later: 'Later', rooms: 'Rooms', room: 'Room {n}', album: 'Keepsakes',
+  redecorate: 'Redecorate', restyle: 'Restyle', free: 'Free', used: 'Used', here: 'Here', newRoom: 'New room!', allDone: '6 / 6',
+  letterTitle: 'The Duchess’s letter',
+  moreLevels: 'Win {n} more levels here to open the next room.', placeRest: 'Place the last {n} to open the next room.',
+  keepFrom: '{room} · keepsake {i} of 2', tapContinue: 'Tap to continue', finale: 'Finale',
+  // Progress tab
+  pRoom: 'Room {n} of 20', pManor: 'Manor decorated', pRooms: 'rooms done', pObjects: 'objects placed', pKeeps: 'keepsakes',
+  shareText: 'I decorated the {room} in Meowsweeper!', yourCat: 'Your cat',
+  pStars: 'stars earned', pLevel: 'level', pPerfect: 'perfect levels', pStreak: 'puzzle streak', pFriends: 'cat friends', pSpend: 'stars to spend',
 };
 
 /** Each room's board mat and sound. `night` cools the cushions for Pepper's dark rooms. */
@@ -268,12 +304,12 @@ export const FRIEND_LINES = {
   mittens: ['You may address me as Mittens.', 'Your tidying is… improving.', 'I permit you to sit beside me.', 'The Duchess would have liked you. I do.'],
   biscuit: ['…you again… nice…', 'You smell like biscuits. Good.', 'Wake me when you’re here. Only you.', 'Best nap buddy. Zzz.'],
   patch: ['Okay, you can see my hiding spot.', 'Race you to the attic!', 'I let you win that one. Maybe.', 'Partners in crime. Forever.'],
-  pepper: ['You listen. Most don’t.', 'She would sit here with me, too.', 'I’ll show you the castle light.', 'You are part of the house now.'],
+  pepper: ['You listen. Most don’t.', 'She would sit here with me, too.', 'I’ll show you my secret window.', 'You are part of the house now.'],
 };
 /** Level 3 friendship improves the cat's perk. */
 export const FRIEND_PERKS = {
   marmalade: { text: '5 hearts instead of 4', boost: { hearts: 5 } },
-  mittens: { text: 'Hint costs 15 instead of 25', boost: { hintPrice: 15 } },
+  mittens: { text: 'Sniff costs 25 instead of 40', boost: { sniffPrice: 25 } },
   biscuit: { text: 'Whisker Scan costs 60', boost: { scanPrice: 60 } },
   patch: { text: 'Catches one cat a level before it wakes (from level 7)', boost: { guards: 1 } },
   pepper: { text: '40% more coins, not 25%', boost: { coinBonus: 0.4 } },
@@ -299,41 +335,30 @@ export const DAILY_NOTES = [
 ];
 
 export const SPECIAL_TEXT = {
-  heart: 'Heart board · nothing hides under wood',
-  teacup: 'Teacup board · nothing hides under wood',
-  cat: 'Cat board · nothing hides under wood',
-  lantern: 'Lantern night · the numbers still tell the truth',
-  catnap: 'Cat nap · more cats, 5 hearts',
+  heart: 'A heart-shaped board! Nothing hides under the wood.',
+  teacup: 'A teacup board! Nothing hides under the wood.',
+  cat: 'A cat-shaped board! Nothing hides under the wood.',
+  lantern: 'Lantern night! It’s dark, but the numbers still work.',
+  catnap: 'Cat nap! Extra cats today, so you get 5 hearts.',
 };
 
-Object.assign(UI, {
-  open: 'Open', mark: 'Mark', special: 'Special board', daily: 'Puzzle of the day', dailyDone: 'Solved today!',
-  dailyPlay: 'Play today’s puzzle', dailyAgain: 'Come back tomorrow for a new puzzle', streak: '{n}-day streak', streak1: '1-day streak', streak0: 'Start a streak today',
-  best: 'Your best times', time: 'Time', heartsKept: 'Hearts kept', dailyReward: '+{c} coins · +{s} ★',
-  weekChest: 'Seven days in a row: a chest of {n} coins!', note: 'From the Duchess’s household book',
-  found: 'Found: {item} ({n}/6)', lostFound: 'Lost & found', setDone: 'Set complete! +{c} coins, +{s} ★',
-  cats: 'Cats', friendship: 'Friendship', friendLevel: 'Level {n}', perkUp: 'Perk upgrade: {t}', nextAt: '{n} more to level {l}',
-  maxLevel: 'Best friends', friendUp: '{cat} likes you more! Friendship level {n}.',
-  share: 'Share my room', before: 'Before', after: 'After', chestCh: 'Chapter chest: +{n} coins',
-  settings: 'Settings', cbNumbers: 'Colour-blind number marks', leftHanded: 'Left-handed layout', vibration: 'Vibration',
-  firstRestore: 'Our first star! Let’s spend it on the Foyer.', coach1: 'Tap this cushion. No cat sleeps here.',
-  coach2: 'This 1 means one cat sleeps in the 8 squares around it.', coach3: 'Win levels to earn stars, then restore the manor!',
-  lanternTip: 'Tap near the light to see better.',
-  opensAt: 'opens at level {n}', lvl: 'Lvl {n}',
-  guardSave: 'Phew! {cat} caught that one. A cat sleeps there.',
-  lockedSay: 'The {room} is still locked. Keep playing to open it!', reachLevel: 'Opens at level {n}', comingUp: 'First job here',
-  foundShort: 'Found', replay: 'Replay', replayTitle: 'Replay levels', replayLine: 'Play a finished level again to earn the stars you missed. New stars count for the manor.',
-  doneTick: 'done!', offerTitle: 'You can restore something!', offerHave: 'You have ★ {n} to spend', restoreNow: 'Restore now', keepPlaying: 'Keep playing',
-  replayOf: 'Replay · level {n}', replayDone: 'Back to level {n}', protect: 'Oops, a cat woke! While you learn, it costs no heart.',
-  heartTitle1: 'Out of hearts!', heartBuy: 'Get coins', heartUse: 'Use {n} coins', heartAd: 'Watch an ad', heartGive: 'Give up',
-  heartLine1: 'Keep going with 1 extra heart.', heartLine2: 'Last chance: one more heart for this level.', heartNeed: 'You need {n} more coins.',
-});
 
-Object.assign(UI, {
-  tapSpot: 'Tap a + to place something new.', needMore: 'Win levels for more stars:',
-  decorate: 'Decorate', add: 'Add', later: 'Later', rooms: 'Rooms', room: 'Room {n}', album: 'Keepsakes',
-  redecorate: 'Redecorate', restyle: 'Restyle', free: 'Free', winLevel: 'Win level {n}', lvlShort: 'Lv {n}',
-  chooseStyle: 'Choose a style', used: 'Used', playHere: 'Play here', here: 'Here', newRoom: 'New room!', allDone: '6 / 6',
-  keepNew: 'Keepsake found!', letterTitle: 'The Duchess’s letter', coachDiary: 'A letter from the Duchess. Tap to read.',
-  coachStars: 'Your stars ★ Tap to decorate the room.', moreLevels: 'Win {n} more levels here to open the next room.', placeRest: 'Place the last {n} to open the next room.', keepFrom: '{room} · keepsake {i} of 2', tapContinue: 'Tap to continue', finale: 'Finale',
-});
+
+/* The player's language: the tables above are English; texts.js has the rest. */
+const L = TEXTS[getLang()];
+if (L) {
+  Object.assign(UI, L.ui || {});
+  for (const [k, v] of Object.entries(L.win || {})) WIN_LINES[k] = v;
+  for (const [k, v] of Object.entries(L.friend || {})) FRIEND_LINES[k] = v;
+  for (const [k, v] of Object.entries(L.perks || {})) if (FRIEND_PERKS[k]) FRIEND_PERKS[k].text = v;
+  Object.assign(SPECIAL_TEXT, L.special || {});
+  (L.intro || []).forEach((text, i) => { if (INTRO[i]) INTRO[i].text = text; });
+  (L.styles || []).forEach((name, i) => { if (STYLES[i]) STYLES[i].name = name; });
+}
+const S = STORY[getLang()];
+if (S) {
+  S.deco.forEach((row, r) => row.forEach((name, o) => { if (DECO_NAMES[r]) DECO_NAMES[r][o] = name; }));
+  S.keep.forEach((pair, r) => pair.forEach(([name, line], i) => { if (KEEPSAKES[r]?.[i]) KEEPSAKES[r][i] = { name, line }; }));
+  S.notes.forEach((note, i) => { DAILY_NOTES[i] = note; });
+  UI.shareText = S.share; UI.yourCat = S.yourCat;
+}

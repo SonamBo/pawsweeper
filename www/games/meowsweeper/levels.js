@@ -28,10 +28,10 @@ const MILESTONES = [
 
 /**
  * When each feature opens. Spread out so a new player learns one thing at a
- * time: marking from the start, then Hint, chords, Scan, Hard levels,
+ * time: marking from the start, then Hint, chords, Sniff, Scan, Hard levels,
  * special boards (14), walls, Catnip as the reward for reaching chapter 2, knots.
  */
-export const UNLOCK = { paw: 1, hint: 3, chord: 5, scan: 10, hard: 12, walls: 21, catnip: 26, knots: 45 };
+export const UNLOCK = { paw: 1, hint: 3, chord: 5, sniff: 7, scan: 10, hard: 12, walls: 21, catnip: 26, knots: 45 };
 
 const lerp = (a, b, t) => a + (b - a) * t;
 

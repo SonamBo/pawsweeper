@@ -12,7 +12,7 @@ Sent with `host.track`. The shell's own events are in `docs/ANALYTICS.md`.
 | `heart_offer` | the out-of-hearts card opens | `level`, `k` (1st or 2nd extra), `price`, `coins`, `buy`, `ad` |
 | `heart_buy_coins` | Get coins is tapped on that card | `level`, `k`, `short` (coins missing) |
 | `extra_heart` | an extra heart is bought or earned by ad | `level`, `n` (1 or 2), `how` (`coins`, `ad`), `price` |
-| `booster_used` | a booster is used | `level`, `booster` (`hint`, `scan`, `catnip`) |
+| `booster_used` | a booster is used | `level`, `booster` (`hint`, `sniff`, `scan`, `catnip`) |
 | `coach_step` | a tutorial pointer shows | `step` (1, 2, `diary`, `stars`) |
 | `replay_start` | an old level is replayed for its stars | `level` |
 | `replay_win` | a replayed level is won | `level`, `stars`, `gained` (new stars) |
