@@ -24,7 +24,7 @@ function catsPanel({ game, shell }) {
     <h2>${tr('tab.cats')}</h2>
     <p class="panel-sub">${tr('cats.sub')}</p>
     <ul class="cards">
-      ${CATS.map((c) => {
+      ${CATS.filter((c) => !(game.catRoster?.hide || []).includes(c.id)).map((c) => {
         const owned = shell.cats.owned.includes(c.id);
         const active = shell.cats.worn === c.id;
         const { revealed, have, need } = unlockProgress(c, shell.stats);
@@ -41,8 +41,8 @@ function catsPanel({ game, shell }) {
           : '';
         return `
         <li class="card ${state}" ${revealed ? `data-buy-cat="${c.id}"` : ''}>
-          <span class="card-art">${cat('face', 44, 'cat-avatar', revealed ? c.id : 'patch')}</span>
-          <span class="card-main"><b>${revealed ? c.name : '???'}</b>${line}${bar}</span>
+          <span class="card-art">${cat('face', 44, 'cat-avatar', revealed || game.catRoster?.showLocked ? c.id : 'patch')}</span>
+          <span class="card-main"><b>${revealed || game.catRoster?.showLocked ? c.name : '???'}</b>${line}${bar}</span>
           ${tag}
         </li>`;
       }).join('')}
@@ -137,7 +137,7 @@ function untilMidnight(now = new Date()) {
 
 const tierLabel = (tier) => tr(`tier.${tier}`);
 
-function dailyPanel({ game, shell, stats }) {
+function dailyPanel({ game, shell, stats, instance }) {
   const d = shell.daily;
   if (!d.tasks.length) {
     return `<h2>${tr('tab.daily')}</h2><p class="panel-sub">${tr('daily.none')}</p>`;
@@ -181,6 +181,7 @@ function dailyPanel({ game, shell, stats }) {
   return `
     <h2>${tr('tab.daily')}</h2>
     <p class="panel-sub">${tr('daily.newIn', { time: untilMidnight() })}</p>
+    ${instance?.dailyCard?.() || ''}
     <ul class="cards">${rows}
       <li class="card task bonus ${d.bonusClaimed ? 'claimed' : ''}">
         <span class="task-tier tier-bonus">${icons.gift(18)}</span>
@@ -201,6 +202,7 @@ export class Panels {
     this.open = null;
     this.onBuy = () => {};
     this.onClaim = () => {};
+    this.onExtra = () => {};           // a game's own card in a tab: opens like its lobby button
     this.onClose = () => this.hide();
     this.el.addEventListener('click', (e) => {
       const claim = e.target.closest('[data-claim]');
@@ -210,6 +212,8 @@ export class Panels {
       if (c) return this.onBuy('cat', c.dataset.buyCat);
       const s = e.target.closest('[data-buy-cosmetic]');
       if (s) return this.onBuy('cosmetic', s.dataset.buyCosmetic);
+      const x = e.target.closest('[data-open-extra]');
+      if (x) return this.onExtra(x.dataset.openExtra);
       const k = e.target.closest('[data-buy-pack]');
       if (k) return this.onBuy('pack', k.dataset.buyPack, k);
     });

@@ -223,7 +223,9 @@ const KEY = 'meowsweeper.lang';
 function shellLang() {
   try {
     const page = globalThis.document?.documentElement?.lang || '';
-    if (TABLES[page] && (page !== 'en' || localStorage.getItem('cashpaws.lang'))) return page;
+    // The shell sets the page's language from Settings → Language; follow it, and
+    // forget a choice an earlier build of the game kept for itself.
+    if (TABLES[page]) { localStorage.removeItem(KEY); return page; }
   } catch { /* no storage */ }
   return null;
 }

@@ -8,6 +8,7 @@
 export const TEXTS = {
   es: {
     ui: {
+      dailyShort: 'Puzle diario', dailyTip: '¡El puzle de hoy! Todos juegan el mismo tablero.', chestIn: 'Faltan {n} días para el cofre semanal', dailyReward: 'Premio de hoy', noteSealed: 'Resuélvelo para leer la nota de la Duquesa.', dailyFirst: '¡Aquí irá tu primer tiempo!',
       manor: 'Mansión Whiskerwood', stars: 'Estrellas', play: 'Jugar nivel {n}', back: 'Atrás', next: 'Siguiente', skip: 'Saltar', go: '¡Vamos!',
       starsGain: '+{n} estrellas para la mansión',
       hintTip: '¡Psst! Ese cojín brillante es seguro. El número que late te dice por qué.',
@@ -79,6 +80,7 @@ export const TEXTS = {
 
   pt: {
     ui: {
+      dailyShort: 'Desafio diário', dailyTip: 'O desafio de hoje! Todos jogam o mesmo tabuleiro.', chestIn: 'Faltam {n} dias para o baú da semana', dailyReward: 'Prêmio de hoje', noteSealed: 'Resolva para ler o bilhete da Duquesa.', dailyFirst: 'Seu primeiro tempo aparece aqui!',
       manor: 'Mansão Whiskerwood', stars: 'Estrelas', play: 'Jogar nível {n}', back: 'Voltar', next: 'Próximo', skip: 'Pular', go: 'Vamos lá!',
       starsGain: '+{n} estrelas para a mansão',
       hintTip: 'Psst! Essa almofada brilhando é segura. O número pulsando mostra por quê.',
@@ -150,6 +152,7 @@ export const TEXTS = {
 
   hi: {
     ui: {
+      dailyShort: 'रोज़ की पहेली', dailyTip: 'आज की पहेली! सब एक ही बोर्ड खेलते हैं।', chestIn: 'साप्ताहिक संदूक में {n} दिन बाकी', dailyReward: 'आज का इनाम', noteSealed: 'डचेस का नोट पढ़ने के लिए इसे हल करो।', dailyFirst: 'तुम्हारा पहला समय यहाँ दिखेगा!',
       manor: 'व्हिस्करवुड हवेली', stars: 'सितारे', play: 'लेवल {n} खेलें', back: 'वापस', next: 'आगे', skip: 'छोड़ें', go: 'चलो!',
       starsGain: 'हवेली के लिए +{n} सितारे',
       hintTip: 'श्श! वह चमकती गद्दी सुरक्षित है। धड़कती संख्या बताती है क्यों।',
@@ -221,6 +224,7 @@ export const TEXTS = {
 
   de: {
     ui: {
+      dailyShort: 'Tagesrätsel', dailyTip: 'Das heutige Rätsel! Alle spielen dasselbe Feld.', chestIn: 'Noch {n} Tage bis zur Wochentruhe', dailyReward: 'Heutige Belohnung', noteSealed: 'Löse es, um die Notiz der Herzogin zu lesen.', dailyFirst: 'Hier steht bald deine erste Zeit!',
       manor: 'Whiskerwood-Herrenhaus', stars: 'Sterne', play: 'Level {n} spielen', back: 'Zurück', next: 'Weiter', skip: 'Überspringen', go: 'Los geht’s!',
       starsGain: '+{n} Sterne fürs Herrenhaus',
       hintTip: 'Psst! Das leuchtende Kissen ist sicher. Die pulsierende Zahl zeigt, warum.',
@@ -292,6 +296,7 @@ export const TEXTS = {
 
   fr: {
     ui: {
+      dailyShort: 'Puzzle du jour', dailyTip: 'Le puzzle du jour ! Tout le monde joue le même plateau.', chestIn: 'Encore {n} jours avant le coffre de la semaine', dailyReward: 'Récompense du jour', noteSealed: 'Résous-le pour lire le mot de la Duchesse.', dailyFirst: 'Ton premier temps s’affichera ici !',
       manor: 'Manoir Whiskerwood', stars: 'Étoiles', play: 'Jouer le niveau {n}', back: 'Retour', next: 'Suivant', skip: 'Passer', go: 'C’est parti !',
       starsGain: '+{n} étoiles pour le manoir',
       hintTip: 'Psst ! Ce coussin qui brille est sûr. Le chiffre qui pulse montre pourquoi.',

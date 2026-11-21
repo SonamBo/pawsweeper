@@ -1269,3 +1269,73 @@
 .ms-cats .ms-cface { width: 64px; height: auto; }
 #app:has(.ms-root) .panel-inner > .panel-sub:has(.ms-pbanner) { display: block; width: 100%; max-width: none; }
 .ms-pmanor { width: 100%; box-sizing: border-box; }
+
+/* ================================================================ *
+ * 3.2: audit fixes
+ * ================================================================ */
+/* Room settings: the Cats button is a normal button, not a stretched box. */
+.ms-settings .ms-mbtn.wide { flex: none; min-height: 52px; margin-top: 14px; }
+
+/* Lobby on a narrow phone: smaller side buttons, the logo and ribbon kept clear of them. */
+@media (max-width: 400px) {
+  .has-scene .extra-btn { width: 56px; }
+  .has-scene .extra-btn .quest-disc { width: 50px; height: 50px; }
+  .has-scene .extra-btn .quest-disc img { width: 40px; height: 40px; }
+  .has-scene .extra-btn .quest-pill { font-size: 10px; padding: 1px 6px; }
+  .has-scene .lobby-extras { right: 6px; gap: 8px; }
+  .has-scene .lobby-main .logo { width: min(210px, 56vw) !important; }
+  .has-scene .lobby-main { padding-right: 52px; padding-left: 0; }
+  .has-scene .tagline-ribbon { font-size: 12px !important; max-width: 100%; }
+}
+
+/* Settings on a short phone: tighter rows so the whole card fits. */
+@media (max-height: 700px) {
+  #app:has(.ms-root) .menu { gap: 6px; margin-top: 10px; }
+  #app:has(.ms-root) .menu button, #app:has(.ms-root) .menu .menu-link { min-height: 40px; padding-top: 6px; padding-bottom: 6px; }
+  #app:has(.ms-root) .settings-note { font-size: 12px; margin-top: 8px; }
+  #app:has(.ms-root) .ovl-card { padding-top: 14px; padding-bottom: 12px; }
+}
+
+/* Task toasts wait at the bottom while the level card celebrates. */
+#app:has(.ms-root):has(.ovl-party) .toast { top: auto; bottom: calc(var(--s4) + var(--safe-bottom) + var(--stack, 0) * 48px); }
+
+/* Long tool names (German, French…) shrink instead of breaking mid-word. */
+.ms-tool-name { hyphens: manual; overflow-wrap: normal; word-break: normal; }
+html:lang(de) .ms-tool-name, html:lang(fr) .ms-tool-name, html:lang(pt) .ms-tool-name, html:lang(es) .ms-tool-name { font-size: 11px; letter-spacing: -.01em; }
+
+/* The daily badge on the board. */
+.ms-ptext .ms-badge.sp img { width: 16px; height: 16px; }
+
+/* The puzzle card at the top of the Daily tab. */
+.ms-dailycard { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 12px; width: 100%; margin: 4px 0 14px; padding: 12px 14px;
+  border-radius: 20px; border: 2.5px solid #f2b632; background: linear-gradient(135deg, #fff3dc, #ffdfa8); box-shadow: 0 4px 0 #e0a24f, 0 8px 16px rgba(90, 50, 20, .12);
+  font-family: var(--font); color: #3e2210; text-align: left; animation: ms-cardin .4s cubic-bezier(.3, 1.4, .5, 1) both; }
+.ms-dailycard:active { transform: translateY(2px); }
+.ms-dc-icon { width: 56px; height: 56px; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(90, 50, 20, .25)); }
+.ms-dc-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ms-dc-main b { font: 900 17px/1.15 var(--font); }
+.ms-dc-main small { font: 800 12px/1.2 var(--font); color: #8a4a1a; }
+.ms-dc-week { display: flex; gap: 4px; margin-top: 3px; }
+.ms-dc-week i { width: 14px; height: 14px; border-radius: 7px; border: 2px dashed #d8b98f; background: #fff7ea; }
+.ms-dc-week i.on { border: 2px solid #f2a23a; background: #f7a33b; }
+.ms-dc-week i.today { box-shadow: 0 0 0 2px rgba(247, 163, 59, .45); }
+.ms-dc-go { display: flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 14px; background: linear-gradient(#5fbf4f, #3f8f34); color: #fff; font: 900 14px/1 var(--font); box-shadow: 0 3px 0 #2c6524; }
+.ms-dailycard.solved .ms-dc-go { background: #3f7f34; font-size: 18px; }
+
+/* The puzzle screen: week, weekly chest, reward, the sealed note, best times. */
+.ms-daily .ms-dscroll { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 2px 2px 8px; }
+.ms-daily .ms-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.ms-daily .ms-day { aspect-ratio: 1; display: grid; place-items: center; position: relative; }
+.ms-daily .ms-day small { position: absolute; top: 3px; font: 900 10px/1 var(--font); color: #8a6a4a; }
+.ms-daily .ms-day svg { width: 60%; height: 60%; margin-top: 6px; }
+.ms-chestrow { display: grid !important; grid-template-columns: 48px 1fr auto; align-items: center; gap: 10px; }
+.ms-chestrow img { width: 48px; height: 48px; object-fit: contain; }
+.ms-chestrow b { font: 900 14px/1.2 var(--font); display: block; }
+.ms-chestbar { display: block; height: 10px; margin-top: 5px; border-radius: 5px; background: #ecd8bd; overflow: hidden; }
+.ms-chestbar i { display: block; height: 100%; background: linear-gradient(90deg, #ffd56b, #f7a33b); border-radius: 5px; }
+.ms-chestrow em { display: flex; align-items: center; gap: 3px; font: 900 13px/1 var(--font); font-style: normal; color: #8a4a1a; }
+.ms-rewardrow small, .ms-note small { font: 800 12px/1.2 var(--font); color: #8a6a4a; }
+.ms-rewardrow .ms-reward { justify-content: flex-start; margin-top: 4px; }
+.ms-sealed { display: flex; align-items: center; gap: 10px; margin: 6px 0 0; font: 800 13px/1.3 var(--font); color: #6b4a35; }
+.ms-sealed img { width: 54px; height: auto; filter: grayscale(.3); }
+.ms-best .empty { font: 700 13px/1.3 var(--font); color: #8a6a4a; list-style: none; }

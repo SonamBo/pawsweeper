@@ -50,6 +50,9 @@ export default {
   styles: ['style.css'],
   analytics: { batch: ['level'] },
 
+  // The Cats tab: the five cats of the story, each shown by name before it is won (Soot has no art).
+  catRoster: { hide: ['soot'], showLocked: true },
+
   // Each cat's perk; the Cats tab shows it with the cat's friendship from the manor.
   perks: {
     patch: { get text() { return withFriend('patch', t('perkPatch')); }, config: {} },
@@ -354,10 +357,12 @@ export default {
     function tipText() {
       if (note) return note;
       if (target) return t('target', { what: boosterName(target) });
-      if (mode === 'daily') return `${UI.daily}: ${today()}`;
+      if (mode === 'daily') return UI.dailyTip;
       if (spec?.special) return SPECIAL_TEXT[spec.special.shape || spec.special.type];
       const key = { 1: 'tip1', 2: 'tip3', 3: 'tipHint', 5: 'tip5', 7: 'tip6', 10: 'tip15', 12: 'tip12', 21: 'tip20', 26: 'tip40', 45: 'tip45' }[level];
-      return key ? t(key) : '';
+      if (key) return t(key);
+      const left = mode === 'level' ? manor.objectsToOpen() : 0;
+      return left ? UI.placeRest.replace('{n}', left) : '';
     }
 
     function drawHud() {
@@ -366,10 +371,10 @@ export default {
       const badge = $('[data-badge]');
       const fin = isFin();
       badge.hidden = !spec.hard && !spec.special && !fin && mode !== 'daily';
-      const bsym = mode === 'daily' ? '' : fin ? 'trophy' : spec.special ? SYM_OF[spec.special.shape || spec.special.type] : '';
-      const btext = mode === 'daily' ? UI.daily : fin ? UI.finale : spec.hard ? t('hard') : UI.special;
+      const bsym = mode === 'daily' ? 'img/icon-daily.png' : fin ? 'trophy' : spec.special ? SYM_OF[spec.special.shape || spec.special.type] : '';
+      const btext = mode === 'daily' ? UI.dailyShort : fin ? UI.finale : spec.hard ? t('hard') : UI.special;
       const bkey = `${bsym}|${btext}`;
-      if (badge.dataset.k !== bkey) { badge.dataset.k = bkey; badge.innerHTML = `${bsym ? `<img src="${symSrc(host, bsym)}" alt="">` : ''}${btext}`; }
+      if (badge.dataset.k !== bkey) { badge.dataset.k = bkey; badge.innerHTML = `${bsym ? `<img src="${bsym.startsWith('img/') ? host.asset(bsym) : symSrc(host, bsym)}" alt="">` : ''}${btext}`; }
       badge.classList.toggle('sp', !!spec.special || mode === 'daily');
       badge.classList.toggle('fin', fin);
       const frac = board ? openCount() / Math.max(1, safeTotal()) : 0;
@@ -430,10 +435,10 @@ export default {
 
     function report() {
       host.progress({
-        title: mode === 'daily' ? UI.daily.split(' ')[0] : t('level', { n: level }),
+        title: mode === 'daily' ? UI.dailyShort : t('level', { n: level }),
         fraction: board ? openCount() / Math.max(1, safeTotal()) : 0,
         figure: board ? `${openCount()} / ${safeTotal()}` : '',
-        sub: mode === 'daily' ? today() : roomName(manor.room()),
+        sub: mode === 'daily' ? niceDate() : roomName(manor.room()),
         level,
         summary: t('summary', { n: level, ch: roomName(manor.room()) }),
       });
@@ -500,7 +505,7 @@ export default {
     let nudgeTimer = null;
     function nudge() {
       clearTimeout(nudgeTimer);
-      if (!host.coach || !board || over || busy || manor.isOpen() || (coachStep && coachStep !== 3) || mode !== 'level') return;
+      if (!onScreen || !host.coach || !board || over || busy || manor.isOpen() || (coachStep && coachStep !== 3) || mode !== 'level') return;
       if (!root.offsetParent || document.querySelector('.overlays .ovl, .ms-pagecard, .ms-keepcard, .ms-sheet, .panel-sheet.in')) { nudgeTimer = setTimeout(nudge, 1200); return; }
       if (!host.flag('coached')) return;
       if (level >= 2 && !host.flag('coachStars') && starPill) {
@@ -519,6 +524,7 @@ export default {
 
     /** Pointers belong to the board: away when anything covers it, back when it is clear again. */
     let pointerWas = 0;
+    let onScreen = false;              // the board is the screen in front
     function clearPointers() {
       clearTimeout(nudgeTimer);
       if (coachStep) pointerWas = coachStep;
@@ -526,15 +532,15 @@ export default {
       coachStep = 0;
     }
     function restorePointers() {
-      const was = pointerWas; pointerWas = 0;
       setTimeout(() => {
-        if (!board || over || busy || manor.isOpen() || !root.offsetParent || document.querySelector('.overlays .ovl, .ms-pagecard, .ms-keepcard, .panel-sheet.in')) return;
+        if (!onScreen || mode !== 'level' || !board || over || busy || manor.isOpen() || !root.offsetParent || document.querySelector('.overlays .ovl, .ms-pagecard, .ms-keepcard, .panel-sheet.in')) return;
+        const was = pointerWas; pointerWas = 0;
         if (was === 1 && level === 1 && !host.flag('coached')) coach(1);
         else nudge();
       }, 450);
     }
 
-    /** Anything that opens over the board (a shell card, a keepsake, the decorate offer) takes the pointer away. */
+    /** Anything that opens over the board (a shell card or tab, a keepsake, the decorate offer) takes the pointer away. */
     let watching = false;
     function watchCovers() {
       if (watching) return;
@@ -543,7 +549,7 @@ export default {
       watching = true;
       const covered = () => !!document.querySelector('.overlays .ovl, .ms-pagecard, .ms-keepcard, .ms-sheet, .panel-sheet.in') || manor.isOpen();
       const mo = new MutationObserver(() => {
-        if (covered()) { if (coachStep) clearPointers(); }
+        if (covered() || !onScreen) { if (coachStep) clearPointers(); }
         else if (pointerWas) restorePointers();
       });
       mo.observe(scr, { childList: true });
@@ -553,6 +559,7 @@ export default {
     }
 
     function coach(step) {
+      if (!onScreen) { pointerWas = step; return; }
       coachStep = step;
       if (!host.coach) return;
       if (step === 1) {
@@ -892,7 +899,7 @@ export default {
             <button class="ms-mbtn wide primary ms-paybtn" data-pay ${short ? 'disabled' : ''}>
               ${host.art.coin(22)}${UI.heartUse.replace('{n}', price)}</button>
             ${short ? `<p class="ms-heartneed">${UI.heartNeed.replace('{n}', short)} <span>(${have} / ${price})</span></p>` : ''}
-            ${canBuy ? `<button class="ms-mbtn wide ms-buybtn" data-buy>${UI.heartBuy}</button>` : ''}
+            ${canBuy && short ? `<button class="ms-mbtn wide ms-buybtn" data-buy>${UI.heartBuy}</button>` : ''}
             ${canAd ? `<button class="ms-mbtn wide ms-adbtn" data-ad>▶ ${UI.heartAd}</button>` : ''}
             <button class="ms-mbtn wide ghost" data-give>${UI.heartGive}</button>
           </div>`;
@@ -1057,6 +1064,9 @@ export default {
       return -1;
     }
     let lastProof = -1;
+    const niceDate = () => {
+      try { return new Date().toLocaleDateString(document.documentElement.lang || 'en', { weekday: 'short', day: 'numeric', month: 'short' }); } catch { return today(); }
+    };
 
     async function hint() {
       const i = findHint();
@@ -1184,15 +1194,17 @@ export default {
         cur: mode !== 'level' ? levelCur : over ? null : snapshot(),
       }),
       show() {
+        onScreen = true;
         fit();
         watchCovers();
+        restorePointers();
         roomShown = '';
         if (board) { setRoom(); drawStarPill(); }
         const scr = root.closest('.screen');
         scr?.classList.remove('ms-enter'); void scr?.offsetWidth; scr?.classList.add('ms-enter');
         ambience(true);
       },
-      hide() { ambience(false); clearPointers(); if (coachStep) coachStep = 0; if (mode === 'daily' && !over) backToLevels(); if (mode === 'replay') backFromReplay(); },
+      hide() { onScreen = false; ambience(false); clearPointers(); if (coachStep) coachStep = 0; if (mode === 'daily' && !over) backToLevels(); if (mode === 'replay') backFromReplay(); },
       pause() { ambience(false); clearPointers(); },
       resume() { ambience(true); restorePointers(); },
       relayout() { fit(); },
@@ -1220,6 +1232,7 @@ export default {
       },
       canOffer: (task) => !task.from || level >= task.from,
       rewardValue: () => heartPrice(level),
+      dailyCard: () => manor.dailyCard(),
       progressRows: () => {
         const st = manor.stats();
         const r = st.room;
