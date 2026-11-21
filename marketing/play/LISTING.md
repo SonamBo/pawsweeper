@@ -65,7 +65,7 @@ Tap. Think. Don't wake the cat.
 ## Contact details
 
 - Email: the studio support address (same as Cash Paws)
-- Privacy policy: https://pixelartgames000.github.io/privacy-policy/
+- Privacy policy: https://pixelartgames000.github.io/meowsweeperprivacypolicy/
 
 ## App content answers
 
