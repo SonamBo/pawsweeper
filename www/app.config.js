@@ -7,7 +7,7 @@ export default {
   "applicationId": "com.pixelartgames.meowsweeper",
   "versionCode": 4,
   "versionName": "3.2.0",
-  "privacyUrl": "https://pixelartgames000.github.io/privacy-policy/",
+  "privacyUrl": "https://pixelartgames000.github.io/meowsweeperprivacypolicy/",
   "contactEmail": "pixelartgames000@gmail.com",
   "shareText": "Tap, think, don't wake the cat 🐾 Meowsweeper",
   "shareImage": "img/share.jpg",
